@@ -1,0 +1,148 @@
+﻿<UserControl x:Class="VeterinarianEMS.PayrollControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VeterinarianEMS"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+
+    <Grid Background="#F0F0F0" Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="Payroll"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"
+                   Foreground="Black"/>
+
+        <Border Grid.Row="1"
+                Background="White"
+                BorderBrush="#CCC"
+                BorderThickness="1"
+                Padding="15">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Top Buttons -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button Background="White" BorderBrush="LightGray" BorderThickness="1" Padding="5,2" Margin="0,0,5,0">
+                            <TextBlock Text="Excel" Foreground="Black"/>
+                        </Button>
+                        <Button Background="White" BorderBrush="LightGray" BorderThickness="1" Padding="5,2" Margin="0,0,5,0">
+                            <TextBlock Text="PDF" Foreground="Black"/>
+                        </Button>
+                        <Button Background="White" BorderBrush="LightGray" BorderThickness="1" Padding="5,2">
+                            <TextBlock Text="Print" Foreground="Black"/>
+                        </Button>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" Background="#30ABA0" Foreground="White" Padding="10,5" BorderThickness="0">
+                        Generate
+                    </Button>
+                </Grid>
+
+                <!-- Filters -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+                    <ComboBox Width="200" Margin="0,0,20,0">
+                        <ComboBoxItem Content="All Employees"/>
+                    </ComboBox>
+
+                    <DatePicker Width="150" SelectedDate="2025-09-01" Margin="0,0,20,0"/>
+                    <DatePicker Width="150" SelectedDate="2025-09-30"/>
+                </StackPanel>
+
+                <!-- DataGrid -->
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Show/Search -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Show" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <ComboBox SelectedIndex="1" Width="60">
+                                <ComboBoxItem Content="5"/>
+                                <ComboBoxItem Content="10"/>
+                                <ComboBoxItem Content="15"/>
+                                <ComboBoxItem Content="20"/>
+                                <ComboBoxItem Content="25"/>
+                            </ComboBox>
+                            <TextBlock Text="entries" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center">
+                            <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox Width="200" Padding="3"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <DataGrid Grid.Row="1"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserSortColumns="True"
+                              HeadersVisibility="Column"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              BorderThickness="1"
+                              BorderBrush="#CCC"
+                              GridLinesVisibility="None"
+                              Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Emp ID" Binding="{Binding EmployeeId}" Width="Auto"/>
+                            <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="*"/>
+                            <DataGridTextColumn Header="Period Start" Binding="{Binding PeriodStart}" Width="*"/>
+                            <DataGridTextColumn Header="Period End" Binding="{Binding PeriodEnd}" Width="*"/>
+                            <DataGridTextColumn Header="Base Salary" Binding="{Binding BaseSalary}" Width="*"/>
+                            <DataGridTextColumn Header="Days Worked" Binding="{Binding DaysWorked}" Width="*"/>
+                            <DataGridTextColumn Header="Overtime Hours" Binding="{Binding OvertimeHours}" Width="*"/>
+                            <DataGridTextColumn Header="Leave Days" Binding="{Binding LeaveDays}" Width="*"/>
+                            <DataGridTextColumn Header="Absent Days" Binding="{Binding AbsentDays}" Width="*"/>
+                            <DataGridTextColumn Header="Late Minutes" Binding="{Binding LateMinutes}" Width="*"/>
+                            <DataGridTextColumn Header="Gross Pay" Binding="{Binding GrossPay}" Width="*"/>
+                            <DataGridTextColumn Header="Net Pay" Binding="{Binding NetPay}" Width="*"/>
+                            <DataGridTextColumn Header="Export Date" Binding="{Binding ExportDate}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+                <!-- Pagination -->
+                <Grid Grid.Row="3" Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Showing 0 to 0 of 0 entries" VerticalAlignment="Center" Foreground="Gray"/>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <Button Content="Previous" Background="LightGray" Foreground="#333" BorderThickness="1" Padding="5,2" Margin="5,0"/>
+                        <Button Content="Next" Background="LightGray" Foreground="#333" BorderThickness="1" Padding="5,2" Margin="5,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

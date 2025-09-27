@@ -1,0 +1,145 @@
+﻿<UserControl x:Class="VeterinarianEMS.EmployeeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VeterinarianEMS"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000">
+
+    <Grid Background="#F0F0F0" Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Employees" 
+                       Grid.Column="0"
+                       FontSize="28" 
+                       FontWeight="Bold" 
+                       VerticalAlignment="Center"
+                       Foreground="Black"/>
+
+            <!-- Add Employee Button -->
+            <Button Grid.Column="1"
+                    Background="#30ABA0"
+                    Foreground="White"
+                    Padding="10,5"
+                    BorderThickness="0">
+                <Border CornerRadius="8" Background="#30ABA0">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Plus" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock Text="Add Employee" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+            </Button>
+        </Grid>
+
+        <!-- Main Content Area -->
+        <Border Grid.Row="1" Grid.RowSpan="2"
+                Background="White"
+                CornerRadius="8"
+                Padding="15">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Top Controls (Display and Search) -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Display" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="Black"/>
+                        <ComboBox SelectedIndex="1" Width="60">
+                            <ComboBoxItem Content="5"/>
+                            <ComboBoxItem Content="10"/>
+                            <ComboBoxItem Content="15"/>
+                            <ComboBoxItem Content="20"/>
+                            <ComboBoxItem Content="25"/>
+                        </ComboBox>
+                        <TextBlock Text="records per page" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="3" VerticalAlignment="Center">
+                        <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="Black"/>
+                        <TextBox Width="200"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- DataGrid for Employees -->
+                <DataGrid Grid.Row="1"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserSortColumns="True"
+                          HeadersVisibility="Column"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          BorderThickness="0"
+                          GridLinesVisibility="None"
+                          Margin="0,0,0,10">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="*"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Department/Position" Binding="{Binding Department}" Width="2*"/>
+                        <DataGridTextColumn Header="Shift" Binding="{Binding Shift}" Width="*"/>
+                        <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" Width="*"/>
+                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="*"/>
+                        <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="2*"/>
+                        <DataGridTemplateColumn Header="Actions" Width="2*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button ToolTip="View">
+                                            <materialDesign:PackIcon Kind="Eye" Foreground="#4A90E2"/>
+                                        </Button>
+                                        <Button ToolTip="Edit">
+                                            <materialDesign:PackIcon Kind="Pencil" Foreground="#50E3C2"/>
+                                        </Button>
+                                        <Button ToolTip="Delete">
+                                            <materialDesign:PackIcon Kind="Delete" Foreground="#E35050"/>
+                                        </Button>
+                                        <Button ToolTip="Shift">
+                                            <materialDesign:PackIcon Kind="SwapHorizontal" Foreground="#9B59B6"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Pagination Section -->
+                <Grid Grid.Row="2" Margin="0,15,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Showing 1 to 1 of 1 entries" VerticalAlignment="Center" Foreground="Gray"/>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                        <Button Content="Previous" Margin="5,0"/>
+                        <Button Content="1" Background="#30ABA0" Foreground="White" Margin="5,0"/>
+                        <Button Content="Next" Margin="5,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

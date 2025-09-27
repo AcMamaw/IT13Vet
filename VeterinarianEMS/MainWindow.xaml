@@ -1,0 +1,245 @@
+﻿<mah:MetroWindow x:Class="VeterinarianEMS.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="VEMS" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        WindowStyle="SingleBorderWindow" 
+        AllowsTransparency="False"
+        ResizeMode="CanResize">
+
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Material Design Theme -->
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Teal" SecondaryColor="Lime" />
+
+                <!-- Default MaterialDesign styles -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+
+                <!-- MahApps.Metro base styles -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- 👇 These overrides must be placed AFTER the theme dictionaries -->
+            <!-- Active Window -->
+            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleBrush" Color="White"/>
+            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleBackgroundBrush" Color="#2E2E2E"/>
+            <!-- Inactive Window -->
+            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleNonActiveBrush" Color="Gray"/>
+            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleNonActiveBackgroundBrush" Color="#1E1E1E"/>
+
+            <!-- Sidebar Menu Item Style -->
+            <Style TargetType="{x:Type Button}" x:Key="SidebarMenuItem">
+                <!-- Normal state -->
+                <Setter Property="Background" Value="#D3D3D3"/>
+                <!-- light gray -->
+                <Setter Property="Foreground" Value="Black"/>
+                <!-- normal text color -->
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="Padding" Value="15,10"/>
+                <Setter Property="Margin" Value="0,2"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                      Margin="{TemplateBinding Padding}"
+                                      RecognizesAccessKey="True"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <!-- Hover trigger -->
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#808080"/>
+                                    <!-- dark gray on hover -->
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <!-- text white on hover -->
+                                </Trigger>
+
+                                <!-- Focus trigger -->
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="Background" Value="#252525"/>
+                                    <!-- dark gray on focus -->
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <!-- text white on focus -->
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <!-- PopupBox style -->
+            <Style x:Key="MaterialDesignToolPopupBox"
+               TargetType="{x:Type materialDesign:PopupBox}"
+               BasedOn="{StaticResource {x:Type materialDesign:PopupBox}}">
+                <Setter Property="StaysOpen" Value="False"/>
+                <Setter Property="PlacementMode" Value="BottomAndAlignRightEdges"/>
+                <Setter Property="Margin" Value="10,0,0,0"/>
+                <Setter Property="Padding" Value="8"/>
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+                <Setter Property="PopupUniformCornerRadius" Value="4"/>
+            </Style>
+
+            <!-- Top bar icons white -->
+            <Style TargetType="materialDesign:PackIcon" x:Key="TopBarIconStyle">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <!-- Top bar -->
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="31*"/>
+            <!-- Main content -->
+        </Grid.RowDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Row="1" Grid.Column="0"
+                Background="#D3D3D3"
+                Grid.RowSpan="2">
+            <!-- Shadow removed -->
+            <StackPanel>
+                <!-- Sidebar Buttons -->
+                <StackPanel>
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Dashboard" Margin="0,10,0,0" Click="DashboardButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Dashboard"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Attendance" Click="AttendanceButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="CalendarCheck" Width="20" Height="20" Margin="0,0,10,0" />
+                            <TextBlock Text="Attendance"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Employee" Click="EmployeeButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="AccountGroup" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Employee"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="LeaveRequest" Click="LeaveRequestButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="CalendarRemove" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Leave Request"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="OvertimeRequest" Click="OvertimeRequestButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ClockPlus" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Overtime Request"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Roles" Click="RolesButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="AccountMultipleOutline" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Roles"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Shifts" Click="ShiftsButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="SwapHorizontal" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Shifts"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Payroll" Click="PayrollButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="CashMultiple" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Payroll"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        
+        
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+        Background="#2E2E2E"  
+        BorderThickness="0,0,0,1"
+        BorderBrush="{DynamicResource MaterialDesignDivider}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- EAS Logo/Image -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                    <Image Source="Assets/logo.png"
+                   Height="35"
+                   Width="35"
+                   VerticalAlignment="Center"
+                   Margin="0,0,8,0"/>
+                    <TextBlock Text="V E M S"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Foreground="White"/>
+                </StackPanel>
+
+                <!-- Right side actions with user dropdown -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
+                    <materialDesign:PopupBox Style="{StaticResource MaterialDesignToolPopupBox}" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False"
+                                     ToolTip="User Profile">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <StackPanel Orientation="Horizontal">
+                                <!-- User Icon -->
+                                <materialDesign:PackIcon Kind="AccountCircle" Width="30" Height="30" VerticalAlignment="Center" Margin="0,0,5,0"  Style="{StaticResource TopBarIconStyle}"/>
+                                <!-- Down Arrow -->
+                                <materialDesign:PackIcon Kind="MenuDown" Width="20" Height="20" VerticalAlignment="Center"  Style="{StaticResource TopBarIconStyle}"/>
+                            </StackPanel>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <StackPanel>
+                            <!-- User Full Name -->
+                            <TextBlock Text="[User Full Name]" FontWeight="Bold" Margin="10,5,10,2"/>
+                            <!-- User Roles -->
+                            <TextBlock Text="[Roles]" Opacity="0.6" Margin="10,0,10,5"/>
+                            <Separator/>
+                            <Button Content="Logout" Click="LogoutButton_Click" />
+                        </StackPanel>
+                    </materialDesign:PopupBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main content area -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource MaterialDesignBackground}" Grid.RowSpan="2">
+            <ContentControl x:Name="MainContentArea" Margin="15"/>
+        </Border>
+    </Grid>
+</mah:MetroWindow>
