@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="VeterinarianEMS.Controls.DateRangePicker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             Height="80" Width="400">
+
+    <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
+
+        <!-- Start Date -->
+        <DatePicker x:Name="StartDatePicker"
+                    Width="160"
+                    Height="35"
+                    SelectedDate="{Binding StartDate, Mode=TwoWay}"
+                    VerticalContentAlignment="Center"
+                    mah:TextBoxHelper.Watermark="Start Date"
+                    Margin="0,0,10,0"/>
+        <!-- Add right margin for spacing -->
+
+        <!-- End Date -->
+        <DatePicker x:Name="EndDatePicker"
+                    Width="160"
+                    Height="35"
+                    SelectedDate="{Binding EndDate, Mode=TwoWay}"
+                    VerticalContentAlignment="Center"
+                    mah:TextBoxHelper.Watermark="End Date"/>
+    </StackPanel>
+</UserControl>

@@ -13,7 +13,8 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         WindowStyle="SingleBorderWindow" 
         AllowsTransparency="False"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+                 >
 
     <mah:MetroWindow.Resources>
         <ResourceDictionary>
@@ -25,8 +26,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
 
                 <!-- MahApps.Metro base styles -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- 👇 These overrides must be placed AFTER the theme dictionaries -->
@@ -238,8 +237,8 @@
         </Border>
 
         <!-- Main content area -->
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource MaterialDesignBackground}" Grid.RowSpan="2">
+        <Border Grid.Row="1" Grid.Column="1" Background="#F0F0F0" Grid.RowSpan="2">
             <ContentControl x:Name="MainContentArea" Margin="15"/>
-        </Border>
+        </Border>   
     </Grid>
 </mah:MetroWindow>

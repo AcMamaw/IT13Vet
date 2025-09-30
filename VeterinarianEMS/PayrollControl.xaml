@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VeterinarianEMS"
-             mc:Ignorable="d" 
+             xmlns:controls="clr-namespace:VeterinarianEMS.Controls"  
+    mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000">
 
     <Grid Background="#F0F0F0" Margin="15">
@@ -59,12 +60,45 @@
 
                 <!-- Filters -->
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
-                    <ComboBox Width="200" Margin="0,0,20,0">
+                    <ComboBox x:Name="EmployeeComboBox"
+          Width="159"
+          SelectedIndex="0"
+          Height="35"
+          Background="White"
+          Foreground="Black"
+          SelectionChanged="EmployeeComboBox_SelectionChanged">
+
+                        <!-- Style for all ComboBox Items -->
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <!-- Set the background for normal, hovered, and selected states -->
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="LightGray"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="LightBlue"/>
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+
+                        <!-- Dropdown values -->
                         <ComboBoxItem Content="All Employees"/>
+                        <ComboBoxItem Content="Employee 1"/>
+                        <ComboBoxItem Content="Employee 2"/>
+                        <ComboBoxItem Content="Employee 3"/>
                     </ComboBox>
 
-                    <DatePicker Width="150" SelectedDate="2025-09-01" Margin="0,0,20,0"/>
-                    <DatePicker Width="150" SelectedDate="2025-09-30"/>
+
+                    <!-- Your custom date range picker -->
+                    <controls:DateRangePicker x:Name="MyDateRange" Margin="0,0,20,0" Height="49"/>
                 </StackPanel>
 
                 <!-- DataGrid -->
@@ -85,13 +119,9 @@
 
                         <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="Show" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <ComboBox SelectedIndex="1" Width="60">
-                                <ComboBoxItem Content="5"/>
-                                <ComboBoxItem Content="10"/>
-                                <ComboBoxItem Content="15"/>
-                                <ComboBoxItem Content="20"/>
-                                <ComboBoxItem Content="25"/>
-                            </ComboBox>
+
+                            <controls:EntriesPerPageSelector x:Name="EntriesSelector" Width="80"/>
+
                             <TextBlock Text="entries" VerticalAlignment="Center" Margin="5,0,0,0"/>
                         </StackPanel>
 
@@ -129,17 +159,39 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-
                 <!-- Pagination -->
-                <Grid Grid.Row="3" Margin="0,5,0,0">
+                <Grid Grid.Row="3" Margin="0,15,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Showing 0 to 0 of 0 entries" VerticalAlignment="Center" Foreground="Gray"/>
+
+                    <!-- Entry info -->
+                    <TextBlock Grid.Column="0" 
+               Text="Showing 1 to 1 of 1 entries" 
+               VerticalAlignment="Center" 
+               Foreground="Gray"/>
+
+                    <!-- Pagination buttons -->
                     <StackPanel Orientation="Horizontal" Grid.Column="1">
-                        <Button Content="Previous" Background="LightGray" Foreground="#333" BorderThickness="1" Padding="5,2" Margin="5,0"/>
-                        <Button Content="Next" Background="LightGray" Foreground="#333" BorderThickness="1" Padding="5,2" Margin="5,0"/>
+                        <Button Content="Previous" 
+                Background="Transparent" 
+                Foreground="#333" 
+                BorderThickness="1" 
+                Padding="5,2" 
+                Margin="5,0"/>
+                        <Button Content="1" 
+                Background="#30ABA0" 
+                Foreground="White" 
+                BorderThickness="0" 
+                Padding="5,2" 
+                Margin="5,0"/>
+                        <Button Content="Next" 
+                Background="Transparent" 
+                Foreground="#333" 
+                BorderThickness="1" 
+                Padding="5,2" 
+                Margin="5,0"/>
                     </StackPanel>
                 </Grid>
             </Grid>

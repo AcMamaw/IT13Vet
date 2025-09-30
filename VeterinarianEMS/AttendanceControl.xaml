@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VeterinarianEMS"
+             xmlns:controls="clr-namespace:VeterinarianEMS.Controls"  
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="1000">
 
@@ -42,8 +43,6 @@
                             BorderThickness="0"
                             FontWeight="SemiBold"
                             FontSize="14"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
                             BorderBrush="#30ABA0"/>
                 </StackPanel>
             </Border>
@@ -89,18 +88,9 @@
                         <!-- Records per page -->
                         <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="Display" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="Black"/>
-                            <ComboBox SelectedIndex="1" Width="60"
-                                      Background="White"
-                                      BorderBrush="#CCC"
-                                      BorderThickness="1"
-                                      Padding="3"
-                                      FontSize="14">
-                                <ComboBoxItem Content="5"/>
-                                <ComboBoxItem Content="10"/>
-                                <ComboBoxItem Content="15"/>
-                                <ComboBoxItem Content="20"/>
-                                <ComboBoxItem Content="25"/>
-                            </ComboBox>
+                           
+                            <controls:EntriesPerPageSelector x:Name="EntriesSelector" Width="80"/>
+
                             <TextBlock Text="records per page" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black"/>
                         </StackPanel>
 
@@ -140,29 +130,43 @@
                     </DataGrid>
 
                     <!-- Pagination -->
-                    <Grid Grid.Row="3" Margin="20,15,20,20">
+                    <Grid Grid.Row="3" Margin="0,15,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="No entries available" VerticalAlignment="Center" Foreground="Gray"/>
-                        <StackPanel Orientation="Horizontal" Grid.Column="1">
-                            <Button Content="Previous"
-                                    Background="Transparent"
-                                    Foreground="#333333"
-                                    BorderThickness="1"
-                                    Padding="5,2"
-                                    FontSize="14"
-                                    FontWeight="SemiBold"
-                                    Margin="5,0"/>
-                            <Button Content="Next"
-                                    Background="Transparent"
-                                    Foreground="#333333"
-                                    BorderThickness="1"
-                                    Padding="5,2"
-                                    FontSize="14"
-                                    FontWeight="SemiBold"
-                                    Margin="5,0"/>
+
+                        <!-- Entry info -->
+                        <TextBlock Grid.Column="0" 
+               Text="Showing 1 to 1 of 1 entries" 
+               VerticalAlignment="Center" 
+               Foreground="Gray"/>
+
+                        <!-- Pagination buttons -->
+                        <StackPanel Orientation="Horizontal" 
+            Grid.Column="1" 
+            VerticalAlignment="Top" 
+            HorizontalAlignment="Left" 
+            Margin="0,-5,0,0">
+
+                            <Button Content="Previous" 
+            Background="Transparent" 
+            Foreground="#333" 
+            BorderThickness="1" 
+            Padding="5,2" 
+            Margin="5,0"/>
+                            <Button Content="1" 
+            Background="#30ABA0" 
+            Foreground="White" 
+            BorderThickness="0" 
+            Padding="5,2" 
+            Margin="5,0"/>
+                            <Button Content="Next" 
+            Background="Transparent" 
+            Foreground="#333" 
+            BorderThickness="1" 
+            Padding="5,2" 
+            Margin="5,0"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

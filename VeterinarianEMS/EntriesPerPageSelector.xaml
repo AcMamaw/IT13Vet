@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="VeterinarianEMS.Controls.EntriesPerPageSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="35" Width="100">
+
+    <ComboBox x:Name="EntriesComboBox"
+              Width="80"
+              SelectedIndex="0"
+              SelectionChanged="EntriesComboBox_SelectionChanged">
+
+        <!-- Style for all ComboBox Items -->
+        <ComboBox.ItemContainerStyle>
+            <Style TargetType="ComboBoxItem">
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="4"/>
+                <!-- Keep text visible when selected -->
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            </Style>
+        </ComboBox.ItemContainerStyle>
+
+        <!-- Dropdown values -->
+        <ComboBoxItem Content="5"/>
+        <ComboBoxItem Content="10"/>
+        <ComboBoxItem Content="15"/>
+        <ComboBoxItem Content="20"/>
+        <ComboBoxItem Content="25"/>
+    </ComboBox>
+</UserControl>

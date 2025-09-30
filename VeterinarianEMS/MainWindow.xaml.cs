@@ -6,10 +6,15 @@ namespace VeterinarianEMS
 {
     public partial class MainWindow : MetroWindow
     {
+
+      
         public MainWindow()
         {
             InitializeComponent();
+            this.WindowState = WindowState.Maximized;
+            MainContentArea.Content = new DashboardControl();
         }
+
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
