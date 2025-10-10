@@ -33,15 +33,15 @@
             <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleBrush" Color="White"/>
             <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleBackgroundBrush" Color="#2E2E2E"/>
             <!-- Inactive Window -->
-            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleNonActiveBrush" Color="Gray"/>
+            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleNonActiveBrush" Color="Teal"/>
             <SolidColorBrush x:Key="MahApps.Brushes.WindowTitleNonActiveBackgroundBrush" Color="#1E1E1E"/>
 
             <!-- Sidebar Menu Item Style -->
             <Style TargetType="{x:Type Button}" x:Key="SidebarMenuItem">
                 <!-- Normal state -->
-                <Setter Property="Background" Value="#D3D3D3"/>
+                <Setter Property="Background" Value="#30ABA0"/>
                 <!-- light gray -->
-                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="Foreground" Value="White"/>
                 <!-- normal text color -->
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -62,15 +62,15 @@
                             <ControlTemplate.Triggers>
                                 <!-- Hover trigger -->
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#808080"/>
+                                    <Setter Property="Background" Value="Aqua"/>
                                     <!-- dark gray on hover -->
-                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Foreground" Value="Black"/>
                                     <!-- text white on hover -->
                                 </Trigger>
 
                                 <!-- Focus trigger -->
                                 <Trigger Property="IsFocused" Value="True">
-                                    <Setter Property="Background" Value="#252525"/>
+                                    <Setter Property="Background" Value="Teal"/>
                                     <!-- dark gray on focus -->
                                     <Setter Property="Foreground" Value="White"/>
                                     <!-- text white on focus -->
@@ -121,7 +121,7 @@
 
         <!-- Sidebar -->
         <Border Grid.Row="1" Grid.Column="0"
-                Background="#D3D3D3"
+                Background="#30ABA0"
                 Grid.RowSpan="2">
             <!-- Shadow removed -->
             <StackPanel>
@@ -182,6 +182,33 @@
                             <TextBlock Text="Payroll"/>
                         </StackPanel>
                     </Button>
+
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Feedback" Click="FeedbackButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="MessageText" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Feedback"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Separator Line -->
+                <Separator Margin="10,200,10,10"
+                   Background="#444"
+                   Height="1"
+                   HorizontalAlignment="Stretch"/>
+
+
+                <!-- Logout Button at Bottom (slightly lifted up) -->
+                <StackPanel VerticalAlignment="Bottom" Margin="0,10,0,10">
+                    <Button Style="{StaticResource SidebarMenuItem}" Tag="Logout" Click="LogoutButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Logout"
+                                     Width="20"
+                                     Height="20"
+                                     Margin="0,0,10,0"/>
+                            <TextBlock Text="Logout"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -211,27 +238,35 @@
                        Foreground="White"/>
                 </StackPanel>
 
-                <!-- Right side actions with user dropdown -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                    <materialDesign:PopupBox Style="{StaticResource MaterialDesignToolPopupBox}" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False"
-                                     ToolTip="User Profile">
-                        <materialDesign:PopupBox.ToggleContent>
-                            <StackPanel Orientation="Horizontal">
-                                <!-- User Icon -->
-                                <materialDesign:PackIcon Kind="AccountCircle" Width="30" Height="30" VerticalAlignment="Center" Margin="0,0,5,0"  Style="{StaticResource TopBarIconStyle}"/>
-                                <!-- Down Arrow -->
-                                <materialDesign:PackIcon Kind="MenuDown" Width="20" Height="20" VerticalAlignment="Center"  Style="{StaticResource TopBarIconStyle}"/>
-                            </StackPanel>
-                        </materialDesign:PopupBox.ToggleContent>
-                        <StackPanel>
-                            <!-- User Full Name -->
-                            <TextBlock Text="[User Full Name]" FontWeight="Bold" Margin="10,5,10,2"/>
-                            <!-- User Roles -->
-                            <TextBlock Text="[Roles]" Opacity="0.6" Margin="10,0,10,5"/>
-                            <Separator/>
-                            <Button Content="Logout" Click="LogoutButton_Click" />
-                        </StackPanel>
-                    </materialDesign:PopupBox>
+                <!-- Right side user info -->
+                <StackPanel Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="0,0,15,0">
+
+
+                    <!-- Name and Role stacked vertically -->
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <!-- Employee Name -->
+                        <TextBlock Text="{Binding FullName}"
+                   Foreground="White"
+                   FontWeight="SemiBold"
+                   FontSize="14"
+                   Margin="0,0,0,2"/>
+
+                        <!-- Employee Role -->
+                        <TextBlock Text="{Binding Role}"
+                   Foreground="#CCCCCC"
+                   FontStyle="Italic"
+                   FontSize="12"/>
+                    </StackPanel>
+                    <!-- User Icon -->
+                    <materialDesign:PackIcon Kind="AccountCircle"
+                      Width="35"
+                      Height="35"
+                      VerticalAlignment="Center"
+                      Margin="10,0,8,0"
+                      Foreground="White"/>
                 </StackPanel>
             </Grid>
         </Border>

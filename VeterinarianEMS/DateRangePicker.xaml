@@ -10,17 +10,16 @@
         <DatePicker x:Name="StartDatePicker"
                     Width="160"
                     Height="35"
-                    SelectedDate="{Binding StartDate, Mode=TwoWay}"
+                    SelectedDate="2025-09-01"
                     VerticalContentAlignment="Center"
                     mah:TextBoxHelper.Watermark="Start Date"
                     Margin="0,0,10,0"/>
-        <!-- Add right margin for spacing -->
 
         <!-- End Date -->
         <DatePicker x:Name="EndDatePicker"
                     Width="160"
                     Height="35"
-                    SelectedDate="{Binding EndDate, Mode=TwoWay}"
+                    SelectedDate="2025-09-30"
                     VerticalContentAlignment="Center"
                     mah:TextBoxHelper.Watermark="End Date"/>
     </StackPanel>

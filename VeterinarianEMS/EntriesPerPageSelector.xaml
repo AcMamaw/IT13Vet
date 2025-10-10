@@ -6,6 +6,7 @@
     <ComboBox x:Name="EntriesComboBox"
               Width="80"
               SelectedIndex="0"
+              HorizontalContentAlignment="Center"
               SelectionChanged="EntriesComboBox_SelectionChanged">
 
         <!-- Style for all ComboBox Items -->

@@ -1,11 +1,12 @@
 ﻿<UserControl x:Class="VeterinarianEMS.LeaveRequestControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:VeterinarianEMS"
-             mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:VeterinarianEMS.Controls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
 
     <Grid Background="#F0F0F0" Margin="15">
         <Grid.RowDefinitions>
@@ -13,7 +14,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+        <!-- HEADER -->
         <TextBlock Grid.Row="0"
                    Text="Leave Requests"
                    FontSize="28"
@@ -21,7 +22,7 @@
                    Margin="0,0,0,20"
                    Foreground="Black"/>
 
-        <!-- Main container -->
+        <!-- MAIN CONTAINER -->
         <Border Grid.Row="1"
                 Background="White"
                 Padding="20"
@@ -31,90 +32,200 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Status Buttons -->
+                <!-- STATUS BUTTONS -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
                     <!-- Pending -->
-                    <Button Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
+                    <Button x:Name="PendingButton" Click="PendingButton_Click"
+                            Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Pending" FontWeight="Bold" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                            <Border Background="#FFC107" Width="20" Height="20">
-                                <TextBlock Text="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                            <Border Background="#FFC107" Width="20" Height="20" CornerRadius="10">
+                                <TextBlock x:Name="PendingCount" Text="0" Foreground="White"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
                             </Border>
                         </StackPanel>
                     </Button>
 
                     <!-- Approved -->
-                    <Button Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
+                    <Button x:Name="ApprovedButton" Click="ApprovedButton_Click"
+                            Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Approved" FontWeight="Bold" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                            <Border Background="#4CAF50" Width="20" Height="20">
-                                <TextBlock Text="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                            <Border Background="#4CAF50" Width="20" Height="20" CornerRadius="10">
+                                <TextBlock x:Name="ApprovedCount" Text="0" Foreground="White"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
                             </Border>
                         </StackPanel>
                     </Button>
 
                     <!-- Rejected -->
-                    <Button Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
+                    <Button x:Name="RejectedButton" Click="RejectedButton_Click"
+                            Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10,5">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Rejected" FontWeight="Bold" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                            <Border Background="#F44336" Width="20" Height="20">
-                                <TextBlock Text="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                            <Border Background="#F44336" Width="20" Height="20" CornerRadius="10">
+                                <TextBlock x:Name="RejectedCount" Text="0" Foreground="White"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
                             </Border>
                         </StackPanel>
                     </Button>
                 </StackPanel>
 
-                <!-- DataGrid -->
-                <DataGrid Grid.Row="1"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          CanUserSortColumns="True"
-                          HeadersVisibility="Column"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          Margin="0,0,0,10"
-                          GridLinesVisibility="None"
-                          BorderThickness="1"
-                          BorderBrush="#CCC">
-                    <DataGrid.Resources>
-                        <Style TargetType="{x:Type DataGridColumnHeader}">
-                            <Setter Property="Background" Value="#E3F2FD"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="Padding" Value="10"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                            <Setter Property="BorderBrush" Value="#BBDEFB"/>
-                            <Setter Property="Foreground" Value="Black"/>
-                            <Setter Property="Cursor" Value="Hand"/>
-                        </Style>
-                    </DataGrid.Resources>
+                <!-- SEARCH & ENTRIES -->
+                <Grid Grid.Row="1" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="Auto"/>
-                        <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
-                        <DataGridTextColumn Header="Leave Type" Binding="{Binding LeaveType}" Width="*"/>
-                        <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate}" Width="*"/>
-                        <DataGridTextColumn Header="End Date" Binding="{Binding EndDate}" Width="*"/>
-                        <DataGridTemplateColumn Header="Actions" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <!-- Add buttons here if needed -->
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox x:Name="SearchBox" Width="200" TextChanged="SearchBox_TextChanged"/>
+                    </StackPanel>
 
-                    <DataGrid.RowDetailsTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="No pending leave requests" FontStyle="Italic" HorizontalAlignment="Center" Margin="0,20" Foreground="Gray"/>
-                        </DataTemplate>
-                    </DataGrid.RowDetailsTemplate>
-                </DataGrid>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Display" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="Black"/>
+                        <controls:EntriesPerPageSelector x:Name="EntriesSelector" Width="80"/>
+                        <TextBlock Text="records per page" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- DATAGRID -->
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <DataGrid x:Name="LeaveDataGrid"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              BorderBrush="#CCC"
+                              BorderThickness="1"
+                              GridLinesVisibility="None"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              MinHeight="200"
+                              MaxHeight="400">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding LeaveID}" Width="70"/>
+                            <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
+                            <DataGridTextColumn Header="Leave Type" Binding="{Binding LeaveType}" Width="*"/>
+                            <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat=d}" Width="*"/>
+                            <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat=d}" Width="*"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+
+                            <!-- ACTION BUTTONS -->
+                            <DataGridTemplateColumn Header="Actions" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-42,0,0,0">
+
+                                            <!-- APPROVE BUTTON -->
+                                            <Button ToolTip="Approve"
+                                                    Margin="2" BorderThickness="0"
+                                                    Click="ApproveLeave_Click">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Pending">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="Transparent" CornerRadius="4" Padding="6">
+                                                            <materialDesign:PackIcon Kind="CheckCircle" Width="16" Height="16" Foreground="#4CAF50"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+
+                                            <!-- REJECT BUTTON -->
+                                            <Button ToolTip="Reject"
+                                                    Margin="2" BorderThickness="0"
+                                                    Click="RejectLeave_Click">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Pending">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="Transparent" CornerRadius="4" Padding="6">
+                                                            <materialDesign:PackIcon Kind="CloseCircle" Width="16" Height="16" Foreground="#F44336"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+
+                                            <!-- DELETE BUTTON -->
+                                            <Button ToolTip="Delete" Margin="2" BorderThickness="0" Click="DeleteLeave_Click">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Pending">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="Transparent" CornerRadius="4" Padding="6">
+                                                            <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" Foreground="#E35050"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+
+                <!-- PAGINATION -->
+                <Grid Grid.Row="3" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock x:Name="ShowingText"
+                               Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Foreground="Gray"
+                               Margin="5,0"
+                               Text="Showing 0 to 0 of 0 entries"/>
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center" Margin="10">
+                        <Button Content="Previous" Click="PreviousPage_Click"
+                                Background="Transparent" Foreground="#333"
+                                BorderThickness="1" Padding="5,2" Margin="5,0"/>
+                        <TextBlock x:Name="PageInfoTextBlock"
+                                   Text="1" Background="#30ABA0"
+                                   Foreground="White" FontWeight="Bold"
+                                   Padding="5,2" Margin="5,0"
+                                   VerticalAlignment="Center"/>
+                        <Button Content="Next" Click="NextPage_Click"
+                                Background="Transparent" Foreground="#333"
+                                BorderThickness="1" Padding="5,2" Margin="5,0"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

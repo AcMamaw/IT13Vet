@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="VeterinarianEMS.ShiftsControl"
+﻿<UserControl x:Class="VeterinarianEMS.EmpLeaveRequestControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -22,41 +22,35 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Title -->
-            <TextBlock Text="Shifts" 
-               Grid.Column="0"
-               FontSize="28" 
-               FontWeight="Bold" 
-               VerticalAlignment="Center"
-               Foreground="Black"/>
+            <TextBlock Text="Employee Leave Requests" 
+                       Grid.Column="0"
+                       FontSize="28" 
+                       FontWeight="Bold" 
+                       VerticalAlignment="Center"
+                       Foreground="Black"/>
 
-            <!-- Add Shift Button -->
             <Button Grid.Column="1"
-            Background="#30ABA0"
-            Foreground="White"
-            Padding="10,5"
-            BorderThickness="0"
-            Click="AddShift_Click">
+                    Background="#30ABA0"
+                    Foreground="White"
+                    Padding="10,5"
+                    BorderThickness="0"
+                    Click="AddLeave_Click">
                 <Border CornerRadius="8" Background="#30ABA0">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Plus" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBlock Text="Add Shift" Foreground="White"/>
+                        <TextBlock Text="Add Leave" Foreground="White"/>
                     </StackPanel>
                 </Border>
             </Button>
         </Grid>
 
-
-        <!-- Shifts Content -->
+        <!-- Leave Requests Content -->
         <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="10">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- Search + Entries -->
                     <RowDefinition Height="*"/>
-                    <!-- DataGrid -->
                     <RowDefinition Height="Auto"/>
-                    <!-- Pagination -->
                 </Grid.RowDefinitions>
 
                 <!-- Search + Entries per page -->
@@ -66,13 +60,11 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- 🔎 Search -->
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
                         <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <TextBox x:Name="SearchTextBox" Width="200" TextChanged="SearchTextBox_TextChanged"/>
                     </StackPanel>
 
-                    <!-- 📋 Records per page -->
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="1">
                         <TextBlock Text="Display" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <controls:EntriesPerPageSelector x:Name="EntriesSelector" Width="80"/>
@@ -81,7 +73,7 @@
                 </Grid>
 
                 <!-- DataGrid -->
-                <DataGrid x:Name="ShiftsDataGrid"
+                <DataGrid x:Name="LeaveDataGrid"
                           Grid.Row="1"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
@@ -93,51 +85,19 @@
                           GridLinesVisibility="None"
                           Margin="10,0,10,10">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*"/>
-                        <DataGridTextColumn Header="Shift Name" Binding="{Binding Name}" Width="*"/>
-                        <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="*"/>
-                        <DataGridTextColumn Header="End Time" Binding="{Binding EndTime}" Width="*"/>
+                        <DataGridTextColumn Header="ID" Binding="{Binding LeaveID}" Width="*"/>
+                        <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
+                        <DataGridTextColumn Header="Leave Type" Binding="{Binding LeaveType}" Width="*"/>
+                        <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat=d}" Width="*"/>
+                        <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat=d}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
 
-                        <!-- Actions Column -->
-                        <DataGridTemplateColumn Header="Actions" Width="120">
+                        <DataGridTemplateColumn Header="Actions" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="-9,0,0,0">
-
-                                        <!-- Edit Button -->
-                                        <Button ToolTip="Edit" Margin="2" BorderThickness="0" Click="EditShift_Click">
-                                            <Button.Style>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Background" Value="Transparent"/>
-                                                    <Setter Property="Padding" Value="6"/>
-                                                    <Setter Property="Cursor" Value="Hand"/>
-                                                    <Setter Property="Foreground" Value="#50E3C2"/>
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="Button">
-                                                                <Border Background="{TemplateBinding Background}" 
-                                                                        CornerRadius="4" 
-                                                                        Padding="{TemplateBinding Padding}">
-                                                                    <ContentPresenter HorizontalAlignment="Center"
-                                                                                      VerticalAlignment="Center"/>
-                                                                </Border>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Background" Value="#50E3C2"/>
-                                                            <Setter Property="Foreground" Value="White"/>
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                            <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16"
-                                                                     Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                        </Button>
-
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
                                         <!-- Delete Button -->
-                                        <Button ToolTip="Delete" Margin="2" BorderThickness="0" Click="DeleteShift_Click">
+                                        <Button ToolTip="Delete" Margin="2" BorderThickness="0" Click="DeleteLeave_Click">
                                             <Button.Style>
                                                 <Style TargetType="Button">
                                                     <Setter Property="Background" Value="Transparent"/>
@@ -147,11 +107,12 @@
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="Button">
-                                                                <Border Background="{TemplateBinding Background}" 
-                                                                        CornerRadius="4" 
+                                                                <Border Background="{TemplateBinding Background}"
+                                                                        CornerRadius="4"
                                                                         Padding="{TemplateBinding Padding}">
                                                                     <ContentPresenter HorizontalAlignment="Center"
-                                                                                      VerticalAlignment="Center"/>
+                                                                                      VerticalAlignment="Center"
+                                                                                      RecognizesAccessKey="True"/>
                                                                 </Border>
                                                             </ControlTemplate>
                                                         </Setter.Value>
@@ -164,10 +125,10 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Button.Style>
-                                            <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
-                                                                     Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                            <materialDesign:PackIcon Kind="Delete"
+                                              Width="16" Height="16"
+                                              Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                                         </Button>
-
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -182,45 +143,37 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left side: showing entries info -->
                     <TextBlock Grid.Column="0"
-               x:Name="EntriesInfoTextBlock"
-               Text="Showing 0 to 0 of 0 entries"
-               VerticalAlignment="Center"
-               Foreground="Gray"
-               Margin="5,0"/>
+                               x:Name="EntriesInfoTextBlock"
+                               Text="Showing 0 to 0 of 0 entries"
+                               VerticalAlignment="Center"
+                               Foreground="Gray"
+                               Margin="5,0"/>
 
-                    <!-- Right side: pagination controls -->
                     <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center" Margin="10">
-
-                        <!-- Previous Button -->
                         <Button Content="Previous"
-                Click="Previous_Click"
-                Background="Transparent"
-                Foreground="#333"
-                BorderThickness="1"
-                Padding="5,2"
-                Margin="5,0"/>
-
-                        <!-- Current Page Number -->
+                                Click="Previous_Click"
+                                Background="Transparent"
+                                Foreground="#333"
+                                BorderThickness="1"
+                                Padding="5,2"
+                                Margin="5,0"/>
                         <TextBlock x:Name="PageInfoTextBlock"
-                   Text="1"
-                   Background="#30ABA0"
-                   Foreground="White"
-                   FontWeight="Bold"
-                   Padding="5,2"
-                   Margin="5,0"
-                   VerticalAlignment="Center"
-                   TextAlignment="Center"/>
-
-                        <!-- Next Button -->
+                                   Text="1"
+                                   Background="#30ABA0"
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   Padding="5,2"
+                                   Margin="5,0"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"/>
                         <Button Content="Next"
-                Click="Next_Click"
-                Background="Transparent"
-                Foreground="#333"
-                BorderThickness="1"
-                Padding="5,2"
-                Margin="5,0"/>
+                                Click="Next_Click"
+                                Background="Transparent"
+                                Foreground="#333"
+                                BorderThickness="1"
+                                Padding="5,2"
+                                Margin="5,0"/>
                     </StackPanel>
                 </Grid>
             </Grid>
