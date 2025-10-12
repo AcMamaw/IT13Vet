@@ -37,11 +37,25 @@
             <StackPanel Grid.Row="1" Margin="0,0,0,10">
                 <TextBlock Text="Leave Type:" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBox x:Name="LeaveTypeTextBox"
-                         Width="280"
-                         Height="35"
-                         VerticalContentAlignment="Center"
-                         Padding="8"
-                         FontSize="14"/>
+             Width="280"
+             Height="35"
+             FontSize="14"
+             Padding="8,0"
+             VerticalContentAlignment="Center"
+             BorderBrush="#CCC"
+             BorderThickness="1"
+             Background="White">
+                    <TextBox.Template>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="6">
+                                <ScrollViewer x:Name="PART_ContentHost"/>
+                            </Border>
+                        </ControlTemplate>
+                    </TextBox.Template>
+                </TextBox>
             </StackPanel>
 
             <!-- Start Date -->

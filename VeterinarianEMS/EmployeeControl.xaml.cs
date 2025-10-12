@@ -112,7 +112,11 @@ namespace VeterinarianEMS
                     }
                 }
 
-                _allEmployees = new List<EmployeeViewModel>(employeeDict.Values);
+                // Reverse order: last employee first
+                _allEmployees = employeeDict.Values
+                                            .OrderByDescending(emp => emp.Id)
+                                            .ToList();
+
                 ApplySearchFilter(); // refresh view
             }
             catch (Exception ex)
@@ -199,16 +203,24 @@ namespace VeterinarianEMS
             popupWindow.ShowDialog();
         }
 
-        // ❌ Delete Employee
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (EmployeeDataGrid.SelectedItem == null) return;
+            if (EmployeeDataGrid.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an employee to delete.", "Warning",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             var employee = EmployeeDataGrid.SelectedItem as EmployeeViewModel;
             if (employee == null) return;
 
-            var result = MessageBox.Show($"Are you sure you want to delete {employee.Name}?",
-                                         "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show(
+                $"Are you sure you want to delete {employee.Name}?\n" +
+                "This will also delete related user and shift data.",
+                "Confirm Delete",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
             if (result != MessageBoxResult.Yes) return;
 
             try
@@ -216,28 +228,58 @@ namespace VeterinarianEMS
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    string query = "DELETE FROM employees WHERE EmployeeID = @EmployeeID";
 
-                    using (var command = new SqlCommand(query, connection))
+                    // Start a transaction for data safety
+                    using (var transaction = connection.BeginTransaction())
                     {
-                        command.Parameters.AddWithValue("@EmployeeID", employee.Id);
-                        int rowsAffected = command.ExecuteNonQuery();
+                        try
+                        {
+                            // 1️⃣ Delete related user record
+                            string deleteUser = "DELETE FROM Users WHERE EmployeeID = @EmployeeID";
+                            using (var cmdUser = new SqlCommand(deleteUser, connection, transaction))
+                            {
+                                cmdUser.Parameters.AddWithValue("@EmployeeID", employee.Id);
+                                cmdUser.ExecuteNonQuery();
+                            }
 
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("Employee deleted successfully.", "Deleted", MessageBoxButton.OK, MessageBoxImage.Information);
-                            LoadEmployees(); // reload after delete
+                            // 2️⃣ Delete related employee shifts (if applicable)
+                            string deleteShifts = "DELETE FROM EmployeeShifts WHERE EmployeeID = @EmployeeID";
+                            using (var cmdShift = new SqlCommand(deleteShifts, connection, transaction))
+                            {
+                                cmdShift.Parameters.AddWithValue("@EmployeeID", employee.Id);
+                                cmdShift.ExecuteNonQuery();
+                            }
+
+                            // 3️⃣ Delete employee record
+                            string deleteEmployee = "DELETE FROM Employees WHERE EmployeeID = @EmployeeID";
+                            using (var cmdEmployee = new SqlCommand(deleteEmployee, connection, transaction))
+                            {
+                                cmdEmployee.Parameters.AddWithValue("@EmployeeID", employee.Id);
+                                cmdEmployee.ExecuteNonQuery();
+                            }
+
+                            // ✅ Commit transaction if all succeed
+                            transaction.Commit();
+
+                            MessageBox.Show("Employee and related data deleted successfully.",
+                                "Deleted", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            LoadEmployees(); // refresh datagrid
                         }
-                        else
+                        catch (Exception exInner)
                         {
-                            MessageBox.Show("Delete failed. Employee not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            // ❌ Rollback if any error occurs
+                            transaction.Rollback();
+                            MessageBox.Show("Error during deletion: " + exInner.Message,
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error: " + ex.Message, "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -326,47 +368,49 @@ namespace VeterinarianEMS
             }
         }
 
-
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (EmployeeDataGrid.SelectedItem is EmployeeViewModel employee)
             {
-                if (EmployeeDataGrid.SelectedItem is EmployeeViewModel employee)
+                var editControl = new EmpEdit(employee.Id);
+
+                editControl.EmployeeSaved += () =>
                 {
-                    var editControl = new EmpEdit(employee.Id); // use Id
+                    LoadEmployees();
+                };
 
-                    // Subscribe to the EmployeeSaved event to reload only the DataGrid
-                    editControl.EmployeeSaved += () =>
-                    {
-                        LoadEmployees(); // This will refresh the DataGrid only
-                    };
+                var window = new Window
+                {
+                    Content = editControl,
+                    WindowStyle = WindowStyle.None,
+                    AllowsTransparency = true,
+                    Background = Brushes.Transparent,
+                    Width = 750,
+                    Height = 700,
+                    ResizeMode = ResizeMode.NoResize,
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                    ShowInTaskbar = false,
+                    Topmost = true
+                };
 
-                    var window = new Window
-                    {
-                        WindowStyle = WindowStyle.None,
-                        ResizeMode = ResizeMode.NoResize,
-                        AllowsTransparency = true,
-                        Background = Brushes.Transparent,
-                        Content = editControl,
-                        Width = 720,
-                        Height = 650,
-                        WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                        ShowInTaskbar = false,
-                        Topmost = true
-                    };
+                // Optional: Fade-in animation for smooth popup effect
+                window.Opacity = 0;
+                window.Loaded += (s, e2) =>
+                {
+                    var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                    window.BeginAnimation(Window.OpacityProperty, fade);
+                };
 
-                    window.ShowDialog(); // Modal popup
-                }
+                window.ShowDialog();
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error opening edit popup: {ex.Message}",
-                                "Error",
+                MessageBox.Show("Please select an employee first.",
+                                "No Selection",
                                 MessageBoxButton.OK,
-                                MessageBoxImage.Error);
+                                MessageBoxImage.Warning);
             }
         }
-
 
 
         // 🟢 Selection changed (optional use: enable/disable buttons, etc.)

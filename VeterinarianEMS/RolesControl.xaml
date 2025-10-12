@@ -51,7 +51,12 @@
             </Grid>
 
             <!-- DataGrid Container -->
-            <Border Grid.Row="1" Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10">
+            <Border Grid.Row="1" 
+                    Background="White" 
+                    BorderBrush="#CCC" 
+                    CornerRadius="8"
+                    BorderThickness="1" 
+                    Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -84,99 +89,137 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- DataGrid -->
-                    <DataGrid x:Name="PositionDataGrid"
-                              Grid.Row="1"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              CanUserSortColumns="True"
-                              HeadersVisibility="Column"
-                              HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto"
-                              BorderThickness="1"
-                              BorderBrush="#CCC"
-                              GridLinesVisibility="None"
-                              Margin="0,0,0,10">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*"/>
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTemplateColumn Header="Actions" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-22,0,0,0">
+                    <!-- Position DataGrid (Attendance/Leave Grid Style) -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <DataGrid x:Name="PositionDataGrid"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              GridLinesVisibility="None"
+              HorizontalScrollBarVisibility="Auto"
+              VerticalScrollBarVisibility="Auto"
+              RowHeight="50"
+              ColumnHeaderHeight="45"
+              AlternatingRowBackground="#FAFAFA"
+              Background="White"
+              MinHeight="200"
+              MaxHeight="400"
+              CanUserResizeRows="False">
 
-                                            <!-- Edit Button -->
-                                            <Button ToolTip="Edit" Margin="2" BorderThickness="0" Click="EditPosition_Click">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Setter Property="Background" Value="Transparent"/>
-                                                        <Setter Property="Padding" Value="6"/>
-                                                        <Setter Property="Cursor" Value="Hand"/>
-                                                        <Setter Property="Foreground" Value="#50E3C2"/>
-                                                        <!-- Green -->
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="Button">
-                                                                    <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="4" 
-                                    Padding="{TemplateBinding Padding}">
-                                                                        <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="#50E3C2"/>
-                                                                <Setter Property="Foreground" Value="White"/>
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                                <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16"
-                                 Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                            </Button>
+                            <DataGrid.Resources>
+                                <!-- Center alignment style for cells -->
+                                <Style x:Key="CenterCellStyle" TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="Foreground" Value="#333"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                </Style>
 
-                                            <!-- Delete Button -->
-                                            <Button ToolTip="Delete" Margin="2" BorderThickness="0" Click="DeletePosition_Click">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Setter Property="Background" Value="Transparent"/>
-                                                        <Setter Property="Padding" Value="6"/>
-                                                        <Setter Property="Cursor" Value="Hand"/>
-                                                        <Setter Property="Foreground" Value="#E35050"/>
-                                                        <!-- Red -->
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="Button">
-                                                                    <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="4" 
-                                    Padding="{TemplateBinding Padding}">
-                                                                        <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="#E35050"/>
-                                                                <Setter Property="Foreground" Value="White"/>
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                                <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
-                                 Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                            </Button>
+                                <!-- Header style -->
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="Background" Value="#F5F5F5"/>
+                                    <Setter Property="Foreground" Value="#444"/>
+                                    <Setter Property="Height" Value="45"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                    <Setter Property="Padding" Value="5,0,5,0"/>
+                                </Style>
 
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                                <!-- Row hover effect -->
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="White"/>
+                                    <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#E3F2FD"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.Resources>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"
+                                ElementStyle="{StaticResource CenterCellStyle}"/>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"
+                                ElementStyle="{StaticResource CenterCellStyle}"/>
+
+                                <!-- Actions Column -->
+                                <DataGridTemplateColumn Header="Actions" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0">
+                                                <!-- EDIT BUTTON -->
+                                                <Button ToolTip="Edit" Click="EditPosition_Click" Margin="2" BorderThickness="0" Cursor="Hand">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Setter Property="Padding" Value="6"/>
+                                                            <Setter Property="Foreground" Value="#50E3C2"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#50E3C2"/>
+                                                                    <Setter Property="Foreground" Value="White"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                    <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16"
+                                                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                                </Button>
+
+                                                <!-- DELETE BUTTON -->
+                                                <Button ToolTip="Delete" Click="DeletePosition_Click" Margin="2" BorderThickness="0" Cursor="Hand">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Setter Property="Padding" Value="6"/>
+                                                            <Setter Property="Foreground" Value="#E35050"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#E35050"/>
+                                                                    <Setter Property="Foreground" Value="White"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
+                                                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
 
                     <!-- Position Pagination -->
                     <Grid Grid.Row="2" Margin="0,5,0,0">
@@ -265,7 +308,12 @@
             </Grid>
 
             <!-- DataGrid Container -->
-            <Border Grid.Row="1" Background="White" BorderBrush="#CCC" BorderThickness="1" Padding="10">
+            <Border Grid.Row="1" 
+                    Background="White" 
+                    BorderBrush="#CCC" 
+                    CornerRadius="8"
+                    BorderThickness="1" 
+                    Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -299,98 +347,137 @@
                     </Grid>
 
 
-                    <!-- DataGrid -->
-                    <DataGrid x:Name="DepartmentDataGrid"
-                              Grid.Row="1"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              CanUserSortColumns="True"
-                              HeadersVisibility="Column"
-                              HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto"
-                              BorderThickness="1"
-                              BorderBrush="#CCC"
-                              GridLinesVisibility="None"
-                              Margin="0,0,0,10">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*"/>
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTemplateColumn Header="Actions" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-22,0,0,0">
+                    <!-- Department DataGrid (Attendance/Leave Grid Style) -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <DataGrid x:Name="DepartmentDataGrid"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              HeadersVisibility="Column"
+              BorderThickness="0"
+              GridLinesVisibility="None"
+              HorizontalScrollBarVisibility="Auto"
+              VerticalScrollBarVisibility="Auto"
+              RowHeight="50"
+              ColumnHeaderHeight="45"
+              AlternatingRowBackground="#FAFAFA"
+              Background="White"
+              MinHeight="200"
+              MaxHeight="400"
+              CanUserResizeRows="False">
 
-                                            <!-- Edit Button -->
-                                            <Button ToolTip="Edit" Margin="2" BorderThickness="0" Click="EditDepartment_Click">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Setter Property="Background" Value="Transparent"/>
-                                                        <Setter Property="Padding" Value="6"/>
-                                                        <Setter Property="Cursor" Value="Hand"/>
-                                                        <Setter Property="Foreground" Value="#50E3C2"/>
-                                                        <!-- Green -->
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="Button">
-                                                                    <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="4" 
-                                    Padding="{TemplateBinding Padding}">
-                                                                        <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="#50E3C2"/>
-                                                                <Setter Property="Foreground" Value="White"/>
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                                <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16"
-                                 Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                            </Button>
+                            <DataGrid.Resources>
+                                <!-- Center alignment style for cells -->
+                                <Style x:Key="CenterCellStyle" TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="Foreground" Value="#333"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                </Style>
 
-                                            <!-- Delete Button -->
-                                            <Button ToolTip="Delete" Margin="2" BorderThickness="0" Click="DeleteDepartment_Click">
-                                                <Button.Style>
-                                                    <Style TargetType="Button">
-                                                        <Setter Property="Background" Value="Transparent"/>
-                                                        <Setter Property="Padding" Value="6"/>
-                                                        <Setter Property="Cursor" Value="Hand"/>
-                                                        <Setter Property="Foreground" Value="#E35050"/>
-                                                        <!-- Red -->
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="Button">
-                                                                    <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="4" 
-                                    Padding="{TemplateBinding Padding}">
-                                                                        <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="#E35050"/>
-                                                                <Setter Property="Foreground" Value="White"/>
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                                <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
-                                 Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                            </Button>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                                <!-- Header style -->
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="Background" Value="#F5F5F5"/>
+                                    <Setter Property="Foreground" Value="#444"/>
+                                    <Setter Property="Height" Value="45"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                    <Setter Property="Padding" Value="5,0,5,0"/>
+                                </Style>
+
+                                <!-- Row hover effect -->
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="White"/>
+                                    <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#E3F2FD"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.Resources>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"
+                                ElementStyle="{StaticResource CenterCellStyle}"/>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"
+                                ElementStyle="{StaticResource CenterCellStyle}"/>
+
+                                <!-- Actions Column -->
+                                <DataGridTemplateColumn Header="Actions" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0">
+                                                <!-- EDIT BUTTON -->
+                                                <Button ToolTip="Edit" Click="EditDepartment_Click" Margin="2" BorderThickness="0" Cursor="Hand">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Setter Property="Padding" Value="6"/>
+                                                            <Setter Property="Foreground" Value="#50E3C2"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#50E3C2"/>
+                                                                    <Setter Property="Foreground" Value="White"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                    <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16"
+                                                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                                </Button>
+
+                                                <!-- DELETE BUTTON -->
+                                                <Button ToolTip="Delete" Click="DeleteDepartment_Click" Margin="2" BorderThickness="0" Cursor="Hand">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Setter Property="Padding" Value="6"/>
+                                                            <Setter Property="Foreground" Value="#E35050"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#E35050"/>
+                                                                    <Setter Property="Foreground" Value="White"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
+                                                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
 
                     <!-- Department Pagination -->
                     <Grid Grid.Row="2" Margin="0,5,0,0">

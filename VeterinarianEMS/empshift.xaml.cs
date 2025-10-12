@@ -1,158 +1,230 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using Microsoft.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
-using static VeterinarianEMS.MainWindow;
 
 namespace VeterinarianEMS.Controls
 {
     public partial class EmpShift : UserControl
     {
-        // Property to store selected employee ID
+        // Connection string (update if needed)
+        private readonly string _connectionString =
+            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=VeterinarianEMS;Integrated Security=True";
+
+        // Employee ID to assign shift for
         public int EmployeeID { get; set; }
 
-        // Event to notify parent that shift has been saved
+        // Event to notify parent window that a shift was saved
         public event Action ShiftSaved;
-
-        // Connection string
-        private readonly string _connString = @"Data Source=(localdb)\MSSQLLocalDB;
-                                                Initial Catalog=VeterinarianEMS;
-                                                Integrated Security=True;";
-
 
         public EmpShift()
         {
             InitializeComponent();
-
-            // Check if current user has HR role or Human Resources
-            if (UserSession.Role == null ||
-                !(UserSession.Role.Contains("HR", StringComparison.OrdinalIgnoreCase) ||
-                  UserSession.Role.Contains("Human Resources", StringComparison.OrdinalIgnoreCase)))
-            {
-                MessageBox.Show("You are not authorized to manage employee shifts.",
-                                "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                // Close the window hosting this control
-                Window.GetWindow(this)?.Close();
-                return;
-            }
-
-            // Only load shifts if authorized
-            LoadShifts();
+            LoadShifts(); // Load shifts into ComboBox when control is initialized
         }
 
+        #region Load Shifts
 
         private void LoadShifts()
         {
             try
             {
-                List<ShiftModel> shifts = new List<ShiftModel>();
-
-                using (SqlConnection conn = new SqlConnection(_connString))
+                using (SqlConnection conn = new SqlConnection(_connectionString))
                 {
                     conn.Open();
-                    string query = "SELECT ShiftID, ShiftName FROM shifts";
-
+                    string query = "SELECT ShiftID, ShiftName FROM Shifts ORDER BY ShiftName";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
+                        var shifts = new List<ShiftItem>();
                         while (reader.Read())
                         {
-                            shifts.Add(new ShiftModel
+                            shifts.Add(new ShiftItem
                             {
-                                ShiftID = Convert.ToInt32(reader["ShiftID"]),
-                                ShiftName = reader["ShiftName"].ToString()
+                                ShiftID = reader.GetInt32(0),
+                                ShiftName = reader.GetString(1)
                             });
                         }
+
+                        ShiftComboBox.ItemsSource = shifts;
+                        ShiftComboBox.DisplayMemberPath = "ShiftName";
+                        ShiftComboBox.SelectedValuePath = "ShiftID";
                     }
                 }
-
-                ShiftComboBox.ItemsSource = shifts;
-                ShiftComboBox.DisplayMemberPath = "ShiftName";
-                ShiftComboBox.SelectedValuePath = "ShiftID";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading shifts: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error loading shifts:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        // Helper class for ComboBox
+        private class ShiftItem
+        {
+            public int ShiftID { get; set; }
+            public string ShiftName { get; set; }
+        }
+
+        #endregion
+
+        #region All Days Logic
+
+        private void AllDaysCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            SetAllDays(true);
+        }
+
+        private void AllDaysCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SetAllDays(false);
+        }
+
+        private void DayCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (AreAllDaysChecked())
+            {
+                AllDaysCheckBox.Checked -= AllDaysCheckBox_Checked;
+                AllDaysCheckBox.IsChecked = true;
+                AllDaysCheckBox.Checked += AllDaysCheckBox_Checked;
+            }
+        }
+
+        private void DayCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (AllDaysCheckBox.IsChecked == true)
+            {
+                AllDaysCheckBox.Unchecked -= AllDaysCheckBox_Unchecked;
+                AllDaysCheckBox.IsChecked = false;
+                AllDaysCheckBox.Unchecked += AllDaysCheckBox_Unchecked;
+            }
+        }
+
+        private void SetAllDays(bool value)
+        {
+            MondayCheckBox.IsChecked = value;
+            TuesdayCheckBox.IsChecked = value;
+            WednesdayCheckBox.IsChecked = value;
+            ThursdayCheckBox.IsChecked = value;
+            FridayCheckBox.IsChecked = value;
+            SaturdayCheckBox.IsChecked = value;
+        }
+
+        private bool AreAllDaysChecked()
+        {
+            return MondayCheckBox.IsChecked == true &&
+                   TuesdayCheckBox.IsChecked == true &&
+                   WednesdayCheckBox.IsChecked == true &&
+                   ThursdayCheckBox.IsChecked == true &&
+                   FridayCheckBox.IsChecked == true &&
+                   SaturdayCheckBox.IsChecked == true;
+        }
+
+        #endregion
+
+        #region Save / Cancel Logic
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             if (ShiftComboBox.SelectedValue == null)
             {
-                MessageBox.Show("Please select a shift.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please select a shift.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             int shiftId = (int)ShiftComboBox.SelectedValue;
-
-            // Collect selected days
-            List<string> selectedDays = new List<string>();
-            if (MondayCheckBox.IsChecked == true) selectedDays.Add("Monday");
-            if (TuesdayCheckBox.IsChecked == true) selectedDays.Add("Tuesday");
-            if (WednesdayCheckBox.IsChecked == true) selectedDays.Add("Wednesday");
-            if (ThursdayCheckBox.IsChecked == true) selectedDays.Add("Thursday");
-            if (FridayCheckBox.IsChecked == true) selectedDays.Add("Friday");
-            if (SaturdayCheckBox.IsChecked == true) selectedDays.Add("Saturday");
+            List<string> selectedDays = GetSelectedDays();
 
             if (selectedDays.Count == 0)
             {
-                MessageBox.Show("Please select at least one day.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please select at least one day.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            string daysText = string.Join(",", selectedDays); // Store as comma-separated string
+            string daysString = string.Join(", ", selectedDays);
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(_connString))
+                using (SqlConnection conn = new SqlConnection(_connectionString))
                 {
                     conn.Open();
 
-                    string query = @"
-                INSERT INTO employeeshifts (EmployeeID, ShiftID, ShiftDays)
-                VALUES (@EmployeeID, @ShiftID, @ShiftDays)";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    // Check if an entry already exists for this employee & shift
+                    string checkQuery = "SELECT COUNT(*) FROM EmployeeShifts WHERE EmployeeID = @EmployeeID AND ShiftID = @ShiftID";
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@EmployeeID", EmployeeID);
-                        cmd.Parameters.AddWithValue("@ShiftID", shiftId);
-                        cmd.Parameters.AddWithValue("@ShiftDays", daysText);
+                        checkCmd.Parameters.AddWithValue("@EmployeeID", EmployeeID);
+                        checkCmd.Parameters.AddWithValue("@ShiftID", shiftId);
 
-                        cmd.ExecuteNonQuery();
+                        int count = (int)checkCmd.ExecuteScalar();
+
+                        if (count > 0)
+                        {
+                            // Update existing record
+                            string updateQuery = "UPDATE EmployeeShifts SET ShiftDays = @ShiftDays WHERE EmployeeID = @EmployeeID AND ShiftID = @ShiftID";
+                            using (SqlCommand updateCmd = new SqlCommand(updateQuery, conn))
+                            {
+                                updateCmd.Parameters.AddWithValue("@ShiftDays", daysString);
+                                updateCmd.Parameters.AddWithValue("@EmployeeID", EmployeeID);
+                                updateCmd.Parameters.AddWithValue("@ShiftID", shiftId);
+                                updateCmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            // Insert new record
+                            string insertQuery = "INSERT INTO EmployeeShifts (EmployeeID, ShiftID, ShiftDays) VALUES (@EmployeeID, @ShiftID, @ShiftDays)";
+                            using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                            {
+                                insertCmd.Parameters.AddWithValue("@EmployeeID", EmployeeID);
+                                insertCmd.Parameters.AddWithValue("@ShiftID", shiftId);
+                                insertCmd.Parameters.AddWithValue("@ShiftDays", daysString);
+                                insertCmd.ExecuteNonQuery();
+                            }
+                        }
                     }
                 }
 
-                MessageBox.Show($"EmployeeID: {EmployeeID}\nShiftID: {shiftId}\nDays: {daysText}\n\nShift saved successfully!",
-                                "Shift Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Shift assigned successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Trigger the parent reload
+                // Fire event to notify parent
                 ShiftSaved?.Invoke();
 
-                // Close this shift window
+                // Optional: clear selections
+                ShiftComboBox.SelectedIndex = -1;
+                SetAllDays(false);
+
+                // 🔹 Close the parent window
                 Window.GetWindow(this)?.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving shift: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error saving to database:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            Window.GetWindow(this)?.Close();
+            // Close the parent window
+            Window parentWindow = Window.GetWindow(this);
+            if (parentWindow != null)
+            {
+                parentWindow.Close();
+            }
         }
 
-        /// <summary>
-        /// Shift model
-        /// </summary>
-        public class ShiftModel
+
+        private List<string> GetSelectedDays()
         {
-            public int ShiftID { get; set; }
-            public string ShiftName { get; set; }
+            List<string> days = new List<string>();
+            if (MondayCheckBox.IsChecked == true) days.Add("Monday");
+            if (TuesdayCheckBox.IsChecked == true) days.Add("Tuesday");
+            if (WednesdayCheckBox.IsChecked == true) days.Add("Wednesday");
+            if (ThursdayCheckBox.IsChecked == true) days.Add("Thursday");
+            if (FridayCheckBox.IsChecked == true) days.Add("Friday");
+            if (SaturdayCheckBox.IsChecked == true) days.Add("Saturday");
+            return days;
         }
+
+        #endregion
     }
 }

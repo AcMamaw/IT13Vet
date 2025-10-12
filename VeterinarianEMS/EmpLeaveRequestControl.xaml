@@ -45,7 +45,12 @@
         </Grid>
 
         <!-- Leave Requests Content -->
-        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="10">
+        <Border Grid.Row="1" 
+                 Background="White" 
+                 BorderBrush="#CCC" 
+                 CornerRadius="8"
+                 BorderThickness="1" 
+                 Padding="10">  
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -72,30 +77,79 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- DataGrid -->
+                <!-- Leave DataGrid -->
                 <DataGrid x:Name="LeaveDataGrid"
-                          Grid.Row="1"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          CanUserSortColumns="True"
-                          HeadersVisibility="Column"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          BorderThickness="0"
-                          GridLinesVisibility="None"
-                          Margin="10,0,10,10">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding LeaveID}" Width="*"/>
-                        <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
-                        <DataGridTextColumn Header="Leave Type" Binding="{Binding LeaveType}" Width="*"/>
-                        <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat=d}" Width="*"/>
-                        <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat=d}" Width="*"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+          Grid.Row="1"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          CanUserSortColumns="True"
+          HeadersVisibility="Column"
+          HorizontalScrollBarVisibility="Auto"
+          VerticalScrollBarVisibility="Auto"
+          BorderThickness="0"
+          GridLinesVisibility="None"
+          Margin="10,0,10,10"
+          RowHeight="45"
+          AlternatingRowBackground="#FAFAFA"
+          Background="White"
+          BorderBrush="#E0E0E0">
 
-                        <DataGridTemplateColumn Header="Actions" Width="*">
+                    <DataGrid.Resources>
+                        <!-- Center alignment style for cell values -->
+                        <Style x:Key="CenterCellStyle" TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Foreground" Value="#333"/>
+                        </Style>
+
+                        <!-- Header style -->
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Background" Value="#F5F5F5"/>
+                            <Setter Property="Foreground" Value="#444"/>
+                            <Setter Property="Height" Value="45"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                        </Style>
+
+                        <!-- Row hover effect -->
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding LeaveID}" Width="60"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Leave Type" Binding="{Binding LeaveType}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat=d}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat=d}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+
+                        <!-- Actions Column -->
+                        <DataGridTemplateColumn Header="Actions" Width="130">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10,0,0,0">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0">
                                         <!-- Delete Button -->
                                         <Button ToolTip="Delete" Margin="2" BorderThickness="0" Click="DeleteLeave_Click">
                                             <Button.Style>
@@ -108,11 +162,10 @@
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="Button">
                                                                 <Border Background="{TemplateBinding Background}"
-                                                                        CornerRadius="4"
-                                                                        Padding="{TemplateBinding Padding}">
+                                                        CornerRadius="4"
+                                                        Padding="{TemplateBinding Padding}">
                                                                     <ContentPresenter HorizontalAlignment="Center"
-                                                                                      VerticalAlignment="Center"
-                                                                                      RecognizesAccessKey="True"/>
+                                                                      VerticalAlignment="Center"/>
                                                                 </Border>
                                                             </ControlTemplate>
                                                         </Setter.Value>
@@ -126,8 +179,8 @@
                                                 </Style>
                                             </Button.Style>
                                             <materialDesign:PackIcon Kind="Delete"
-                                              Width="16" Height="16"
-                                              Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                                     Width="16" Height="16"
+                                                     Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                                         </Button>
                                     </StackPanel>
                                 </DataTemplate>

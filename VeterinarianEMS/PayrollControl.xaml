@@ -112,28 +112,81 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- DataGrid -->
+                    <!-- Payroll DataGrid -->
                     <DataGrid x:Name="PayrollDataGrid"
-                              Grid.Row="1"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              CanUserSortColumns="True"
-                              HeadersVisibility="Column"
-                              HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto"
-                              BorderThickness="1"
-                              BorderBrush="#CCC"
-                              GridLinesVisibility="None"
-                              Margin="0,0,0,10">
+          Grid.Row="1"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          CanUserSortColumns="True"
+          HeadersVisibility="Column"
+          HorizontalScrollBarVisibility="Auto"
+          VerticalScrollBarVisibility="Auto"
+          BorderThickness="0"
+          GridLinesVisibility="None"
+          Margin="20,0,20,10"
+          RowHeight="45"
+          AlternatingRowBackground="#FAFAFA"
+          Background="White"
+          BorderBrush="#E0E0E0"
+          CanUserResizeRows="False">
+
+                        <DataGrid.Resources>
+                            <!-- Center alignment style for cell values -->
+                            <Style x:Key="CenterCellStyle" TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Foreground" Value="#333"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+
+                            <!-- Header style -->
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Background" Value="#F5F5F5"/>
+                                <Setter Property="Foreground" Value="#444"/>
+                                <Setter Property="Height" Value="45"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                <Setter Property="Padding" Value="5,0,5,0"/>
+                            </Style>
+
+                            <!-- Row hover effect -->
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#E3F2FD"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Resources>
+
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding PayrollID}" Width="90"/>
-                            <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="1.5*"/>
-                            <DataGridTextColumn Header="PeriodStart" Binding="{Binding PayPeriodStart}" Width="1.8*"/>
-                            <DataGridTextColumn Header="PeriodEnd" Binding="{Binding PayPeriodEnd}" Width="1.8*"/>
-                            <DataGridTextColumn Header="TotalHours" Binding="{Binding TotalHoursWorked}" Width="*"/>
-                            <DataGridTextColumn Header="LeaveDays" Binding="{Binding LeaveDays}" Width="*"/>
-                            <DataGridTextColumn Header="Salary" Binding="{Binding ComputedSalary, StringFormat=₱{0:N2}}" Width="*"/>
-                            <DataGridTextColumn Header="ExportDate" Binding="{Binding ExportDate}" Width="2*"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding PayrollID}" Width="70"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="1.4*"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="Period Start" Binding="{Binding PayPeriodStart}" Width="1.9*"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="Period End" Binding="{Binding PayPeriodEnd}" Width="1.9*"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="TotalHours" Binding="{Binding TotalHoursWorked}" Width="79"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="LeaveDays" Binding="{Binding LeaveDays}" Width="78"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="Salary" Binding="{Binding ComputedSalary, StringFormat=₱{0:N2}}" Width="1.1*"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
+                            <DataGridTextColumn Header="Export Date" Binding="{Binding ExportDate}" Width="2*"
+            ElementStyle="{StaticResource CenterCellStyle}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

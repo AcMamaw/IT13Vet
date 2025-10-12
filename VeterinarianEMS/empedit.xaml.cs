@@ -30,8 +30,6 @@ namespace VeterinarianEMS.Views
             LoadPositions();
             LoadEmployee(_employeeId);
         }
-
-        // Load employee data from DB and pre-fill fields
         private void LoadEmployee(int employeeId)
         {
             try
@@ -40,9 +38,9 @@ namespace VeterinarianEMS.Views
                 {
                     conn.Open();
                     string query = @"SELECT EmployeeID, FirstName, MiddleName, LastName, Sex, PositionID, DepartmentID,
-                                            ContactNumber, BaseSalary, HireDate, Address, DOB
-                                     FROM employees
-                                     WHERE EmployeeID = @EmployeeID";
+                                    ContactNumber, BaseSalary, HourlyRate, HireDate, Address, DOB, Email
+                             FROM employees
+                             WHERE EmployeeID = @EmployeeID";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -63,6 +61,13 @@ namespace VeterinarianEMS.Views
                                 ContactTextBox.Text = reader["ContactNumber"].ToString();
                                 HireDatePicker.SelectedDate = reader["HireDate"] as DateTime?;
                                 AddressTextBox.Text = reader["Address"].ToString();
+
+                                // ✅ Added: Email
+                                EmailTextBox.Text = reader["Email"].ToString();
+
+                                // ✅ Added: Hourly Rate
+                                if (reader["HourlyRate"] != DBNull.Value)
+                                    HourlyRateTextBox.Text = ((decimal)reader["HourlyRate"]).ToString("F2");
 
                                 // Pre-select Department
                                 int deptId = reader["DepartmentID"] != DBNull.Value ? Convert.ToInt32(reader["DepartmentID"]) : -1;

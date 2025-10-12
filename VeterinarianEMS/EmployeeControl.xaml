@@ -49,9 +49,11 @@
 
         <!-- Main Content -->
         <Border Grid.Row="1" Grid.RowSpan="2"
-                Background="White"
-                CornerRadius="8"
-                Padding="15">
+                  Background="White" 
+                  BorderBrush="#CCC" 
+                  CornerRadius="8"
+                  BorderThickness="1" 
+                  Padding="10">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -83,29 +85,78 @@
                 </Grid>
 
 
-                <!-- DataGrid -->
-                <DataGrid Grid.Row="1"
-                          x:Name="EmployeeDataGrid"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          CanUserSortColumns="True"
-                          HeadersVisibility="Column"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          BorderThickness="0"
-                          GridLinesVisibility="None"
-                              Margin="0,0,0,10" SelectionChanged="EmployeeDataGrid_SelectionChanged">
+                <DataGrid x:Name="EmployeeDataGrid"
+                      Grid.Row="1"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserSortColumns="True"
+                      HeadersVisibility="Column"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      BorderThickness="0"
+                      GridLinesVisibility="None"
+                      Margin="20,0,20,10"
+                      RowHeight="50"
+                      AlternatingRowBackground="#FAFAFA"
+                      Background="White"
+                      BorderBrush="#E0E0E0">
+
+                    <DataGrid.Resources>
+                        <!-- Center alignment for all text cells -->
+                        <Style x:Key="CenterCellStyle" TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Foreground" Value="#333"/>
+                        </Style>
+
+                        <!-- Header style -->
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Background" Value="#F5F5F5"/>
+                            <Setter Property="Foreground" Value="#444"/>
+                            <Setter Property="Height" Value="45"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                        </Style>
+
+                        <!-- Row hover effect -->
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*"/>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
-                        <DataGridTextColumn Header="Department/Position" Binding="{Binding Department}" Width="4*"/>
-                        <DataGridTextColumn Header="Shift" Binding="{Binding Shift}" Width="2*"/>
-                        <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" Width="1*"/>
-                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="1*"/>
-                        <DataGridTemplateColumn Header="Actions" Width="Auto" MinWidth="140">
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="1.5*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Department/Position" Binding="{Binding Department}" Width="3*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Shift" Binding="{Binding Shift}" Width="130"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" Width="80"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="60"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+
+                        <!-- ACTION BUTTONS COLUMN -->
+                        <DataGridTemplateColumn Header="Actions" Width="180">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-50,0,0,0">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
 
                                         <!-- View Button -->
                                         <Button ToolTip="View" Margin="2" BorderThickness="0" Click="ViewButton_Click">
@@ -248,7 +299,6 @@
                                              Width="16" Height="16"
                                              Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                                         </Button>
-
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

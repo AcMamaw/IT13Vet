@@ -32,7 +32,12 @@
                    Foreground="Black"/>
 
         <!-- Feedback Entry Section -->
-        <Border Grid.Row="1" Background="White" Padding="20" BorderBrush="#CCC" BorderThickness="1" Margin="0,0,0,15">
+        <Border Grid.Row="1" 
+                 Background="White" 
+                 BorderBrush="#CCC" 
+                 CornerRadius="8"
+                 BorderThickness="1" 
+                 Padding="10">
             <StackPanel>
                 <TextBlock Text="Your Feedback:" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBox x:Name="FeedbackTextBox" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>

@@ -27,24 +27,83 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Pending Requests -->
-                <Border Background="White" CornerRadius="10" BorderBrush="#E35050" BorderThickness="4,0,0,0" Margin="5">
-                    <StackPanel Margin="10">
-                        <materialDesign:PackIcon Kind="Email" Width="30" Height="30" Foreground="#E35050"/>
-                        <TextBlock Text="Pending Requests" FontSize="14" FontWeight="SemiBold" Margin="0,10,0,5"/>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Leave: 0" x:Name="PendingLeaveTextBlock" FontSize="16" FontWeight="SemiBold" Foreground="Black"/>
-                            <TextBlock Text="Overtime: 0" x:Name="PendingOvertimeTextBlock" FontSize="16" FontWeight="SemiBold" Foreground="Black"/>
+                <!-- 📨 Pending Requests Card -->
+                <Border CornerRadius="15"
+            Padding="15"
+            BorderBrush="#F44336"
+            BorderThickness="0"
+            Grid.Column="0"
+            Effect="{DynamicResource MaterialDesignElevationShadow4}" Margin="10,0,10,10">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#FFFFFF" Offset="0"/>
+                            <GradientStop Color="#FEF5F5" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                            <Border Width="45" Height="45" Background="#F44336" CornerRadius="10" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="EmailOutline" Foreground="White" Width="28" Height="28"
+                                             VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Pending Requests" FontWeight="Bold" FontSize="16" Foreground="#222"/>
+                                <TextBlock Text="Awaiting approvals" FontSize="12" Foreground="#777"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Content -->
+                        <StackPanel Margin="5,0,0,0">
+                            <TextBlock Text="Leave Requests" FontWeight="SemiBold" FontSize="13" Foreground="#555" Margin="0,3,0,0"/>
+                            <TextBlock x:Name="PendingLeaveTextBlock" Text="0 Pending" FontWeight="Bold" FontSize="20" Foreground="#E53935"/>
+
+                            <Separator Margin="0,8"/>
+
+                            <TextBlock Text="Overtime Requests" FontWeight="SemiBold" FontSize="13" Foreground="#555" Margin="0,3,0,0"/>
+                            <TextBlock x:Name="PendingOvertimeTextBlock" Text="0 Pending" FontWeight="Bold" FontSize="20" Foreground="#FB8C00"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
-                <!-- Days Until Next Payroll -->
-                <Border Grid.Column="1" Background="White" CornerRadius="10" BorderBrush="#9B59B6" BorderThickness="4,0,0,0" Margin="5">
-                    <StackPanel Margin="10">
-                        <materialDesign:PackIcon Kind="CashMultiple" Width="30" Height="30" Foreground="#9B59B6"/>
-                        <TextBlock Text="Days Until Next Payroll" FontSize="14" FontWeight="SemiBold" Margin="0,10,0,5"/>
-                        <TextBlock Text="5" x:Name="DaysUntilPayrollTextBlock" FontSize="28" FontWeight="Bold" Foreground="Black"/>
+                <!-- 💰 Days Until Next Payroll Card -->
+                <Border Grid.Column="1"
+            CornerRadius="15"
+            Padding="15"
+            BorderBrush="#9B59B6"
+            BorderThickness="0"
+            Effect="{DynamicResource MaterialDesignElevationShadow4}" Margin="10,0,10,10">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#FFFFFF" Offset="0"/>
+                            <GradientStop Color="#F5F3FF" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                            <Border Width="45" Height="45" Background="#9B59B6" CornerRadius="10" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="CashMultiple" Foreground="White" Width="28" Height="28"
+                                             VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Next Payroll" FontWeight="Bold" FontSize="16" Foreground="#222"/>
+                                <TextBlock Text="Days remaining" FontSize="12" Foreground="#777"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Main Display -->
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10,0,0">
+                            <TextBlock x:Name="DaysUntilPayrollTextBlock"
+                           Text="5"
+                           FontSize="42"
+                           FontWeight="Bold"
+                           Foreground="#9B59B6"
+                           HorizontalAlignment="Center"/>
+                            <TextBlock Text="Days Left" FontSize="14" Foreground="#666" HorizontalAlignment="Center"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -65,24 +124,107 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Left Column: Attendance & Overtime -->
-                    <StackPanel Grid.Column="0" Margin="5">
-                        <Border Background="White" CornerRadius="10" Padding="10" Margin="0,0,0,10" Height="200">
+                    <StackPanel Grid.Column="0" Margin="10,0,10,0" VerticalAlignment="Top">
+
+                        <!-- 🟢 Top Attendance Card -->
+                        <Border Background="White"
+                        CornerRadius="12"
+                        Padding="15"
+                        Margin="0,0,0,15"
+                        Height="188">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                            </Border.Effect>
+
                             <StackPanel>
-                                <TextBlock Text="Top Employees (Attendance)" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
-                                <ListBox x:Name="TopAttendanceList" BorderThickness="0" Background="Transparent"/>
+                                <!-- Title -->
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                                    <Rectangle Width="6" Height="22" Fill="#30ABA0" RadiusX="3" RadiusY="3" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Top Employees (Attendance)"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Foreground="#333"/>
+                                </StackPanel>
+
+                                <!-- List -->
+                                <Border Background="#FAFAFA"
+                    BorderBrush="#EEE"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="8">
+                                    <ListBox x:Name="TopAttendanceList"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Foreground="#444"
+                         FontSize="14"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,4">
+                                                    <TextBlock Text="{Binding EmployeeName}"
+                                           FontWeight="SemiBold"
+                                           Width="150"/>
+                                                    <TextBlock Text="{Binding DaysPresent, StringFormat='Days: {0}'}"
+                                           Foreground="#30ABA0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Border>
                             </StackPanel>
                         </Border>
 
-                        <Border Background="White" CornerRadius="10" Padding="10" Height="194">
+
+                        <!-- 🕒 Top Overtime Card -->
+                        <Border Background="White"
+            CornerRadius="12"
+            Padding="15"
+            Height="197">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                            </Border.Effect>
+
                             <StackPanel>
-                                <TextBlock Text="Top Employees (Overtime)" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
-                                <ListBox x:Name="TopOvertimeList" BorderThickness="0" Background="Transparent"/>
+                                <!-- Title -->
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                                    <Rectangle Width="6" Height="22" Fill="#FFA726" RadiusX="3" RadiusY="3" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Top Employees (Overtime)"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Foreground="#333"/>
+                                </StackPanel>
+
+                                <!-- List -->
+                                <Border Background="#FAFAFA"
+                    BorderBrush="#EEE"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="8">
+                                    <ListBox x:Name="TopOvertimeList"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Foreground="#444"
+                         FontSize="14"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="0,4">
+                                                    <TextBlock Text="{Binding EmployeeName}"
+                                           FontWeight="SemiBold"
+                                           Width="150"/>
+                                                    <TextBlock Text="{Binding OvertimeHours, StringFormat='Hours: {0}'}"
+                                           Foreground="#FFA726"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Border>
                             </StackPanel>
                         </Border>
                     </StackPanel>
 
                     <!-- Right Column: Attendance Trend Chart -->
-                    <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="10" Margin="5,5,5,5" Height="400">
+                    <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="10" Margin="5,5,10,5" Height="400">
                         <StackPanel>
                             <TextBlock Text="Employee Attendance Trend (Aug - Oct)" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
                             <lvc:CartesianChart x:Name="AttendanceTrendChart" LegendLocation="Right" Height="340"/>
@@ -98,55 +240,205 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Left Column: Satisfaction -->
-                    <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10" Margin="5" Height="250">
+                    <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="10,5,10,5"
+                        Height="250">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                        </Border.Effect>
+
                         <StackPanel>
-                            <TextBlock Text="Employee Satisfaction" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                            <TextBlock Text="Distribution of employee satisfaction levels" FontStyle="Italic" FontSize="12" Foreground="Gray" Margin="0,0,0,5"/>
-                            <lvc:PieChart x:Name="EmployeeSatisfactionChart" Height="180"/>
+                            <!-- Title -->
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,15">
+                                <Rectangle Width="6" Height="22" Fill="#30ABA0" RadiusX="3" RadiusY="3" Margin="0,0,8,0"/>
+                                <TextBlock Text="Employee Satisfaction"
+                       FontWeight="Bold"
+                       FontSize="16"
+                       Foreground="#333"/>
+                            </StackPanel>
+
+                            <!-- Subtitle -->
+                            <TextBlock Text="Distribution of employee satisfaction levels"
+                   FontStyle="Italic"
+                   FontSize="12"
+                   Foreground="Gray"
+                   Margin="0,0,0,10"/>
+
+                            <!-- Pie Chart -->
+                            <lvc:PieChart x:Name="EmployeeSatisfactionChart" Height="160"/>
                         </StackPanel>
                     </Border>
 
                     <!-- Right Column: Top Rated Employees -->
-                    <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="10" Margin="5" Height="250">
+                    <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="10,5,10,5"
+                        Height="250">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                        </Border.Effect>
+
                         <StackPanel>
-                            <TextBlock Text="Top Rated Employees" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                            <TextBlock Text="Based on performance ratings" FontStyle="Italic" FontSize="12" Foreground="Gray" Margin="0,0,0,5"/>
-                            <ListBox x:Name="TopRatedEmployeesList" BorderThickness="0" Background="Transparent"/>
+                            <!-- Title -->
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                                <Rectangle Width="6" Height="22" Fill="#4A90E2" RadiusX="3" RadiusY="3" Margin="0,0,8,0"/>
+                                <TextBlock Text="Top Rated Employees"
+                       FontWeight="Bold"
+                       FontSize="16"
+                       Foreground="#333"/>
+                            </StackPanel>
+
+                            <!-- Subtitle -->
+                            <TextBlock Text="Based on performance ratings"
+                   FontStyle="Italic"
+                   FontSize="12"
+                   Foreground="#777"
+                   Margin="2,0,0,12"/>
+
+                            <!-- List -->
+                            <Border Background="#FAFAFA"
+                BorderBrush="#EEE"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="8">
+                                <ListBox x:Name="TopRatedEmployeesList"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     Foreground="#444"
+                     FontSize="14"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="0,4">
+                                                <TextBlock Text="{Binding EmployeeName}"
+                                       FontWeight="SemiBold"
+                                       Width="150"/>
+                                                <TextBlock Text="{Binding Rating, StringFormat='⭐ {0:F1}'}"
+                                       Foreground="#4A90E2"
+                                       FontWeight="Bold"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Border>
                         </StackPanel>
                     </Border>
                 </Grid>
 
                 <!-- Row 3: On Time/Late / On Leave & Pending Leave -->
-                <Grid Grid.Row="2" Margin="0,0,0,10">
+                <Grid Grid.Row="2" Margin="0,10,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left Column: On Time / Late -->
-                    <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10" Margin="5">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <StackPanel Margin="0,0,20,0">
-                                <TextBlock Text="On Time" FontWeight="SemiBold"/>
-                                <TextBlock x:Name="OnTimeEmployeesText" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <!-- 🕒 Left Card: On Time / Late -->
+                    <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="10,0,10,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                        </Border.Effect>
+
+                        <StackPanel>
+                            <!-- Title -->
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,15">
+                                <Rectangle Width="6" Height="22" Fill="#30ABA0" RadiusX="3" RadiusY="3" Margin="0,0,8,0"/>
+                                <TextBlock Text="Attendance Overview"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Foreground="#333"/>
                             </StackPanel>
-                            <StackPanel>
-                                <TextBlock Text="Late Today" FontWeight="SemiBold"/>
-                                <TextBlock x:Name="LateEmployeesText" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+                            <!-- Data Section -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <StackPanel HorizontalAlignment="Center" Margin="0,0,40,0">
+                                    <TextBlock Text="On Time"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               Foreground="#30ABA0"
+                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="OnTimeEmployeesText"
+                               Text="0"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#30ABA0"
+                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="Late Today"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               Foreground="#E57373"
+                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="LateEmployeesText"
+                               Text="0"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#E57373"
+                               HorizontalAlignment="Center"/>
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <!-- Right Column: On Leave / Pending -->
-                    <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="10" Margin="5">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <StackPanel Margin="0,0,20,0">
-                                <TextBlock Text="Employees on Leave" FontWeight="SemiBold"/>
-                                <TextBlock x:Name="EmployeesOnLeaveText" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <!-- 🌴 Right Card: On Leave / Pending Leave -->
+                    <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="10,0,10,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                        </Border.Effect>
+
+                        <StackPanel>
+                            <!-- Title -->
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,15">
+                                <Rectangle Width="6" Height="22" Fill="#FFA726" RadiusX="3" RadiusY="3" Margin="0,0,8,0"/>
+                                <TextBlock Text="Leave Summary"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Foreground="#333"/>
                             </StackPanel>
-                            <StackPanel>
-                                <TextBlock Text="Pending Leave Requests" FontWeight="SemiBold"/>
-                                <TextBlock x:Name="PendingLeavesText" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+                            <!-- Data Section -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <StackPanel HorizontalAlignment="Center" Margin="0,0,40,0">
+                                    <TextBlock Text="Employees on Leave"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               Foreground="#FFA726"
+                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="EmployeesOnLeaveText"
+                               Text="0"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#FFA726"
+                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="Pending Requests"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               Foreground="#F57C00"
+                               HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="PendingLeavesText"
+                               Text="0"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#F57C00"
+                               HorizontalAlignment="Center"/>
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>

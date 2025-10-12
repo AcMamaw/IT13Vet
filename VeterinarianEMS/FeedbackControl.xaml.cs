@@ -54,18 +54,18 @@ namespace VeterinarianEMS
                     conn.Open();
 
                     string query = @"
-                        SELECT 
-                            f.FeedbackID,
-                            e.FirstName,
-                            e.MiddleName,
-                            e.LastName,
-                            f.FeedbackType,
-                            f.FeedbackText,
-                            f.FeedbackDate,
-                            f.Reviewed
-                        FROM Feedback f
-                        INNER JOIN Employees e ON f.EmployeeID = e.EmployeeID
-                        ORDER BY f.FeedbackDate DESC";
+                SELECT 
+                    f.FeedbackID,
+                    e.FirstName,
+                    e.MiddleName,
+                    e.LastName,
+                    f.FeedbackType,
+                    f.FeedbackText,
+                    f.FeedbackDate,
+                    f.Reviewed
+                FROM Feedback f
+                INNER JOIN Employees e ON f.EmployeeID = e.EmployeeID
+                ORDER BY f.FeedbackDate DESC"; // initial DB order
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -81,6 +81,8 @@ namespace VeterinarianEMS
                                 employeeFullName += " " + middleName[0] + ".";
                             employeeFullName += " " + lastName;
 
+                            string reviewed = reader.IsDBNull(7) ? "No" : reader.GetString(7);
+
                             _allFeedbacks.Add(new Feedback
                             {
                                 FeedbackID = reader.GetInt32(0),
@@ -88,11 +90,17 @@ namespace VeterinarianEMS
                                 Category = reader.GetString(4),
                                 Comment = reader.GetString(5),
                                 Date = reader.GetDateTime(6),
-                                Reviewed = reader.IsDBNull(7) ? null : reader.GetString(7)
+                                Reviewed = reviewed
                             });
                         }
                     }
                 }
+
+                // 📝 Sort: unreviewed first, reviewed last, each group by Date descending
+                _allFeedbacks = _allFeedbacks
+                    .OrderBy(f => f.Reviewed?.Trim().ToLower() == "yes")  // unreviewed first
+                    .ThenByDescending(f => f.Date)                        // newest first within group
+                    .ToList();
             }
             catch (Exception ex)
             {

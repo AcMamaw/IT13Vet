@@ -83,58 +83,56 @@ namespace VeterinarianEMS
                 MessageBox.Show("Error loading employees: " + ex.Message);
             }
         }
-
         private void LoadPayrolls()
+        {
+            _allPayrolls.Clear();
+            try
             {
-                _allPayrolls.Clear();
-                try
+                using (SqlConnection conn = new SqlConnection(_connString))
                 {
-                    using (SqlConnection conn = new SqlConnection(_connString))
+                    conn.Open();
+                    string query = @"
+                SELECT p.PayrollID, p.EmployeeID, p.PayPeriodStart, p.PayPeriodEnd,
+                       p.TotalHoursWorked, p.LeaveDays, p.ExportDate, p.ComputedSalary,
+                       e.FirstName, e.MiddleName, e.LastName
+                FROM payrollexport p
+                LEFT JOIN employees e ON p.EmployeeID = e.EmployeeID
+                ORDER BY p.PayrollID DESC"; // last inserted first
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        conn.Open();
-                        string query = @"
-                    SELECT p.PayrollID, p.EmployeeID, p.PayPeriodStart, p.PayPeriodEnd,
-                           p.TotalHoursWorked, p.LeaveDays, p.ExportDate, p.ComputedSalary,
-                           e.FirstName, e.MiddleName, e.LastName
-                    FROM payrollexport p
-                    LEFT JOIN employees e ON p.EmployeeID = e.EmployeeID
-                    ORDER BY p.ExportDate DESC";
-
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                string fullName = reader["FirstName"] != DBNull.Value
-                                    ? reader["FirstName"].ToString() +
-                                      (reader["MiddleName"] != DBNull.Value && !string.IsNullOrEmpty(reader["MiddleName"].ToString()) ? " " + reader["MiddleName"] : "") +
-                                      " " + reader["LastName"]
-                                    : "Unknown";
+                            string fullName = reader["FirstName"] != DBNull.Value
+                                ? reader["FirstName"].ToString() +
+                                  (reader["MiddleName"] != DBNull.Value && !string.IsNullOrEmpty(reader["MiddleName"].ToString()) ? " " + reader["MiddleName"] : "") +
+                                  " " + reader["LastName"]
+                                : "Unknown";
 
-                                _allPayrolls.Add(new PayrollRecord
-                                {
-                                    PayrollID = Convert.ToInt32(reader["PayrollID"]),
-                                    EmployeeID = reader["EmployeeID"] != DBNull.Value ? Convert.ToInt32(reader["EmployeeID"]) : 0,
-                                    EmployeeName = fullName,
-                                    PayPeriodStart = reader["PayPeriodStart"] != DBNull.Value ? Convert.ToDateTime(reader["PayPeriodStart"]) : (DateTime?)null,
-                                    PayPeriodEnd = reader["PayPeriodEnd"] != DBNull.Value ? Convert.ToDateTime(reader["PayPeriodEnd"]) : (DateTime?)null,
-                                    TotalHoursWorked = reader["TotalHoursWorked"] != DBNull.Value ? Convert.ToInt32(reader["TotalHoursWorked"]) : 0,
-                                    LeaveDays = reader["LeaveDays"] != DBNull.Value ? Convert.ToInt32(reader["LeaveDays"]) : 0,
-                                    ExportDate = reader["ExportDate"] != DBNull.Value ? Convert.ToDateTime(reader["ExportDate"]) : (DateTime?)null,
-                                    ComputedSalary = reader["ComputedSalary"] != DBNull.Value ? Convert.ToDecimal(reader["ComputedSalary"]) : 0
-                                });
-                            }
+                            _allPayrolls.Add(new PayrollRecord
+                            {
+                                PayrollID = Convert.ToInt32(reader["PayrollID"]),
+                                EmployeeID = reader["EmployeeID"] != DBNull.Value ? Convert.ToInt32(reader["EmployeeID"]) : 0,
+                                EmployeeName = fullName,
+                                PayPeriodStart = reader["PayPeriodStart"] != DBNull.Value ? Convert.ToDateTime(reader["PayPeriodStart"]) : (DateTime?)null,
+                                PayPeriodEnd = reader["PayPeriodEnd"] != DBNull.Value ? Convert.ToDateTime(reader["PayPeriodEnd"]) : (DateTime?)null,
+                                TotalHoursWorked = reader["TotalHoursWorked"] != DBNull.Value ? Convert.ToInt32(reader["TotalHoursWorked"]) : 0,
+                                LeaveDays = reader["LeaveDays"] != DBNull.Value ? Convert.ToInt32(reader["LeaveDays"]) : 0,
+                                ExportDate = reader["ExportDate"] != DBNull.Value ? Convert.ToDateTime(reader["ExportDate"]) : (DateTime?)null,
+                                ComputedSalary = reader["ComputedSalary"] != DBNull.Value ? Convert.ToDecimal(reader["ComputedSalary"]) : 0
+                            });
                         }
                     }
+                }
 
-                    ApplySearchFilter(); // Initial load
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error loading payrolls: " + ex.Message);
-                }
+                ApplySearchFilter(); // refresh view
             }
-
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading payrolls: " + ex.Message);
+            }
+        }
 
         #endregion
 
@@ -447,35 +445,71 @@ namespace VeterinarianEMS
         {
             try
             {
-                // 🔹 Create FlowDocument (same as before)
+                // 1️⃣ Create FlowDocument
                 FlowDocument doc = new FlowDocument
                 {
-                    PagePadding = new Thickness(60),
+                    PagePadding = new Thickness(50),
                     FontFamily = new FontFamily("Segoe UI"),
                     FontSize = 12,
                     ColumnWidth = double.PositiveInfinity
                 };
 
-                // ... build your header, table, and footer here as you did before ...
+                // 2️⃣ Add a header
+                Paragraph header = new Paragraph(new Run("Payroll Report"))
+                {
+                    FontSize = 20,
+                    FontWeight = FontWeights.Bold,
+                    TextAlignment = TextAlignment.Center,
+                    Margin = new Thickness(0, 0, 0, 20)
+                };
+                doc.Blocks.Add(header);
 
-                // 🔹 Get printer queue for "Microsoft Print to PDF"
+                // 3️⃣ Create table
+                Table table = new Table();
+                doc.Blocks.Add(table);
+
+                // Add columns
+                int columnCount = 6; // Employee, Start, End, Hours, Leave, Salary
+                for (int i = 0; i < columnCount; i++)
+                    table.Columns.Add(new TableColumn());
+
+                // Add header row
+                TableRowGroup headerGroup = new TableRowGroup();
+                TableRow headerRow = new TableRow();
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Employee"))) { FontWeight = FontWeights.Bold });
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Start"))) { FontWeight = FontWeights.Bold });
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run("End"))) { FontWeight = FontWeights.Bold });
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Hours"))) { FontWeight = FontWeights.Bold });
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Leave"))) { FontWeight = FontWeights.Bold });
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Salary"))) { FontWeight = FontWeights.Bold });
+                headerGroup.Rows.Add(headerRow);
+                table.RowGroups.Add(headerGroup);
+
+                // Add data rows
+                TableRowGroup dataGroup = new TableRowGroup();
+                foreach (var payroll in _filteredPayrolls) // or _allPayrolls
+                {
+                    TableRow row = new TableRow();
+                    row.Cells.Add(new TableCell(new Paragraph(new Run(payroll.EmployeeName))));
+                    row.Cells.Add(new TableCell(new Paragraph(new Run(payroll.PayPeriodStart?.ToShortDateString() ?? ""))));
+                    row.Cells.Add(new TableCell(new Paragraph(new Run(payroll.PayPeriodEnd?.ToShortDateString() ?? ""))));
+                    row.Cells.Add(new TableCell(new Paragraph(new Run(payroll.TotalHoursWorked.ToString()))));
+                    row.Cells.Add(new TableCell(new Paragraph(new Run(payroll.LeaveDays.ToString()))));
+                    row.Cells.Add(new TableCell(new Paragraph(new Run(payroll.ComputedSalary.ToString("C"))))); // currency
+                    dataGroup.Rows.Add(row);
+                }
+                table.RowGroups.Add(dataGroup);
+
+                // 4️⃣ Print to PDF
                 LocalPrintServer printServer = new LocalPrintServer();
                 PrintQueue pdfQueue = printServer.GetPrintQueue("Microsoft Print to PDF");
-
-                // 🔹 Set PDF output path
                 string outputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "PayrollReport.pdf");
-
-                // 🔹 Configure print ticket
                 PrintTicket ticket = pdfQueue.DefaultPrintTicket;
                 ticket.PageOrientation = PageOrientation.Portrait;
-
-                // 🔹 Create XpsDocumentWriter
                 XpsDocumentWriter writer = PrintQueue.CreateXpsDocumentWriter(pdfQueue);
 
-                // 🔹 Use a wrapper to specify output file
                 using (var stream = new FileStream(outputPath, FileMode.Create))
                 {
-                    // Convert FlowDocument to FixedDocument for printing
                     IDocumentPaginatorSource idpSource = doc;
                     writer.Write(idpSource.DocumentPaginator, ticket);
                 }

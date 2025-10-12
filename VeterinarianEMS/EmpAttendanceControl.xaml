@@ -37,7 +37,13 @@
         </Grid>
 
         <!-- Attendance Logs Section -->
-        <Border Grid.Row="1" Background="White">
+        <Border Grid.Row="1" 
+                 Background="White" 
+                 BorderBrush="#CCC" 
+                 CornerRadius="8"
+                 BorderThickness="1" 
+                 Padding="10">
+            
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -111,25 +117,73 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- DataGrid -->
+                <!-- Employee Attendance DataGrid -->
                 <DataGrid x:Name="AttendanceDataGrid"
-                          Grid.Row="2"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          CanUserSortColumns="True"
-                          HeadersVisibility="Column"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          BorderThickness="0"
-                          GridLinesVisibility="None"
-                          Margin="20,0,20,10">
+          Grid.Row="2"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          CanUserSortColumns="True"
+          HeadersVisibility="Column"
+          HorizontalScrollBarVisibility="Auto"
+          VerticalScrollBarVisibility="Auto"
+          BorderThickness="0"
+          GridLinesVisibility="None"
+          Margin="20,0,20,10"
+          RowHeight="45"
+          AlternatingRowBackground="#FAFAFA"
+          Background="White"
+          BorderBrush="#E0E0E0">
+
+                    <DataGrid.Resources>
+                        <!-- Center alignment style for cell values -->
+                        <Style x:Key="CenterCellStyle" TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Foreground" Value="#333"/>
+                        </Style>
+
+                        <!-- Header style -->
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Background" Value="#F5F5F5"/>
+                            <Setter Property="Foreground" Value="#444"/>
+                            <Setter Property="Height" Value="45"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                        </Style>
+
+                        <!-- Row hover effect -->
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E3F2FD"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="Auto"/>
-                        <DataGridTextColumn Header="EmployeeID" Binding="{Binding EmployeeId}" Width="*"/>
-                        <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="*"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
-                        <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding DateTime}" Width="*"/>
+                        <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="60"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="EmployeeID" Binding="{Binding EmployeeID}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
+                        <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding DateTime}" Width="*"
+                            ElementStyle="{StaticResource CenterCellStyle}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -149,8 +203,8 @@
                     <StackPanel Orientation="Horizontal" 
                                 Grid.Column="1" 
                                 VerticalAlignment="Top" 
-                                HorizontalAlignment="Left" 
-                                Margin="0,-5,0,0">
+                                HorizontalAlignment="Center" 
+                                Margin="0,-10,0,0">
 
                         <Button x:Name="PreviousButton"
                                 Content="Previous" 
@@ -166,7 +220,7 @@
                                 Foreground="White" 
                                 BorderThickness="0" 
                                 Padding="5,2" 
-                                Margin="5,0"/>
+                                Margin="5,0" Height="18"/>
                         <Button x:Name="NextButton"
                                 Content="Next" 
                                 Background="Transparent" 

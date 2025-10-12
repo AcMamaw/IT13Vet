@@ -1,104 +1,239 @@
 ﻿<UserControl x:Class="VeterinarianEMS.Controls.EmpView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Width="Auto" Height="600" Background="Transparent">
+             Width="380" Height="450" Background="Transparent">
+    <UserControl.Resources>
+
+        <Style TargetType="TextBlock" x:Key="TitleStyle">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#30ABA0"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="HeaderStyle">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#30ABA0"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="LabelStyle">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="ValueStyle">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#555555"/>
+            <Setter Property="Margin" Value="0,2,0,5"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#30ABA0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#38C0B2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#259489"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TabControl">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabControl}">
+                        <Grid ClipToBounds="true" SnapsToDevicePixels="true" KeyboardNavigation.TabNavigation="Local">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="ColumnDefinition0"/>
+                                <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
+                                <RowDefinition x:Name="RowDefinition1" Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TabPanel x:Name="HeaderPanel" IsItemsHost="true" Margin="2,2,2,0"
+                                      Background="Transparent" Grid.Column="0" Grid.Row="0"/>
+                            <Border x:Name="ContentBorder" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}"
+                                    Grid.Column="0" Grid.Row="1"
+                                    CornerRadius="0,8,8,8"
+                                    Padding="10">
+                                <ContentPresenter x:Name="PART_SelectedContentHost"
+                                                  ContentSource="SelectedContent"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Background" Value="#EAEAEA"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5,10,5"/>
+            <Setter Property="Margin" Value="0,0,2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid SnapsToDevicePixels="true">
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6,6,0,0"
+                                    Margin="0,0,0,-1">
+                                <ContentPresenter x:Name="ContentSite"
+                                                  ContentSource="Header"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#F0F0F0"/>
+                                <Setter Property="Foreground" Value="#333333"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter Property="Panel.ZIndex" Value="1"/>
+                                <Setter TargetName="Border" Property="Background" Value="White"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#E0E0E0"/>
+                                <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0"/>
+                                <Setter Property="Foreground" Value="#30ABA0"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#CCCCCC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
 
     <Grid Margin="10">
-        <Border Background="White" CornerRadius="8" Padding="20"
-                BorderBrush="#CCC" BorderThickness="1"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Width="700" Height="600">
+        <Border Background="White" CornerRadius="10" Padding="15"
+                BorderBrush="#E0E0E0" BorderThickness="1"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <!-- Title -->
-                    <TextBlock Text="Employee Details"
-                               Foreground="#30ABA0"
-                               FontSize="22"
-                               FontWeight="SemiBold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,20"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                    <!-- Two-column layout -->
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Text="Employee View" Style="{StaticResource TitleStyle}"/>
 
-                        <!-- Employee Description (Left) -->
-                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                            <TextBlock Text="Employee Description"
-                                       FontSize="16" FontWeight="Bold"
-                                       Foreground="#333" Margin="0,0,0,10"/>
-                            <TextBlock Text="Full Name:" FontWeight="Bold"/>
-                            <TextBlock x:Name="FullNameTextBlock" FontSize="14"/>
+                <TabControl Grid.Row="1">
+                    <TabItem Header="Employee">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="5,10,5,10">
+                            <StackPanel>
+                                <TextBlock Text="Employee Description" Style="{StaticResource HeaderStyle}"/>
 
-                            <TextBlock Text="Sex:" FontWeight="Bold"/>
-                            <TextBlock x:Name="SexTextBlock" FontSize="14"/>
+                                <TextBlock Text="Full Name:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="FullNameTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                            <TextBlock Text="Age:" FontWeight="Bold"/>
-                            <TextBlock x:Name="AgeTextBlock" FontSize="14"/>
+                                <TextBlock Text="Sex:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="SexTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                            <TextBlock Text="Contact Number:" FontWeight="Bold"/>
-                            <TextBlock x:Name="ContactTextBlock" FontSize="14"/>
+                                <TextBlock Text="Age:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="AgeTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                            <TextBlock Text="Address:" FontWeight="Bold"/>
-                            <TextBlock x:Name="AddressTextBlock" TextWrapping="Wrap" FontSize="14"/>
+                                <TextBlock Text="Contact Number:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="ContactTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                            <TextBlock Text="Date of Birth:" FontWeight="Bold"/>
-                            <TextBlock x:Name="DOBTextBlock" FontSize="14"/>
-                        </StackPanel>
+                                <TextBlock Text="Address:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="AddressTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                        <!-- Shift Description (Right) -->
-                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                            <TextBlock Text="Shift Description"
-                                       FontSize="16" FontWeight="Bold"
-                                       Foreground="#333" Margin="0,0,0,10"/>
-                            <TextBlock Text="Shift Name:" FontWeight="Bold"/>
-                            <TextBlock x:Name="ShiftNameTextBlock" FontSize="14"/>
+                                <TextBlock Text="Date of Birth:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="DOBTextBlock" Style="{StaticResource ValueStyle}"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
 
-                            <TextBlock Text="Start Time:" FontWeight="Bold"/>
-                            <TextBlock x:Name="ShiftStartTextBlock" FontSize="14"/>
+                    <TabItem Header="Job">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="5,10,5,10">
+                            <StackPanel>
+                                <TextBlock Text="Job Description" Style="{StaticResource HeaderStyle}"/>
 
-                            <TextBlock Text="End Time:" FontWeight="Bold"/>
-                            <TextBlock x:Name="ShiftEndTextBlock" FontSize="14"/>
+                                <TextBlock Text="Position:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="PositionTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                            <TextBlock Text="Days:" FontWeight="Bold"/>
-                            <TextBlock x:Name="ShiftDaysTextBlock" FontSize="14"/>
-                        </StackPanel>
-                    </Grid>
+                                <TextBlock Text="Department:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="DepartmentTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                    <!-- Job Description (Full Width) -->
-                    <TextBlock Text="Job Description"
-                               FontSize="16" FontWeight="Bold"
-                               Foreground="#333" Margin="0,10,0,10"/>
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="Position:" FontWeight="Bold"/>
-                        <TextBlock x:Name="PositionTextBlock" FontSize="14"/>
+                                <TextBlock Text="Base Salary:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="SalaryTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                        <TextBlock Text="Department:" FontWeight="Bold"/>
-                        <TextBlock x:Name="DepartmentTextBlock" FontSize="14"/>
+                                <TextBlock Text="Hire Date:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="HireDateTextBlock" Style="{StaticResource ValueStyle}"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
 
-                        <TextBlock Text="Base Salary:" FontWeight="Bold"/>
-                        <TextBlock x:Name="SalaryTextBlock" FontSize="14"/>
+                    <TabItem Header="Schedule">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="5,10,5,10">
+                            <StackPanel>
+                                <TextBlock Text="Shift Description" Style="{StaticResource HeaderStyle}"/>
 
-                        <TextBlock Text="Hire Date:" FontWeight="Bold"/>
-                        <TextBlock x:Name="HireDateTextBlock" FontSize="14"/>
-                    </StackPanel>
+                                <TextBlock Text="Shift Name:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="ShiftNameTextBlock" Style="{StaticResource ValueStyle}"/>
 
-                    <!-- Close Button -->
-                    <Button Content="Close"
-                            Width="100"
-                            Height="35"
-                            HorizontalAlignment="Center"
-                            Background="#30ABA0"
-                            Foreground="White"
-                            BorderThickness="0"
-                            Margin="0,20,0,0"
-                            Click="Close_Click"/>
-                </StackPanel>
-            </ScrollViewer>
+                                <TextBlock Text="Start Time:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="ShiftStartTextBlock" Style="{StaticResource ValueStyle}"/>
+
+                                <TextBlock Text="End Time:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="ShiftEndTextBlock" Style="{StaticResource ValueStyle}"/>
+
+                                <TextBlock Text="Days:" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock x:Name="ShiftDaysTextBlock" Style="{StaticResource ValueStyle}"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+
+                <Button Grid.Row="2" Content="Close"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Margin="0,15,0,0"
+                        Click="Close_Click"/>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

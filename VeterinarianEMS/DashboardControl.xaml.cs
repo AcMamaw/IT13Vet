@@ -1,6 +1,7 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
 using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,15 +10,15 @@ namespace VeterinarianEMS.Controls
 {
     public partial class DashboardControl : UserControl
     {
-        private string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=VeterinarianEMS;Integrated Security=True;";
+        private readonly string connectionString =
+            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=VeterinarianEMS;Integrated Security=True;";
 
         public DashboardControl()
         {
             InitializeComponent();
-            LoadDashboardData(); // your previous methods
-            LoadTopInfoCards();  // this method for pending requests & payroll
+            LoadDashboardData();
+            LoadTopInfoCards();
         }
-
 
         private void LoadDashboardData()
         {
@@ -29,7 +30,20 @@ namespace VeterinarianEMS.Controls
             LoadEmployeeSatisfaction();
         }
 
+        // ✅ Models for binding to ListBoxes
+        public class TopAttendanceItem
+        {
+            public string EmployeeName { get; set; }
+            public int DaysPresent { get; set; }
+        }
 
+        public class TopOvertimeItem
+        {
+            public string EmployeeName { get; set; }
+            public int OvertimeHours { get; set; }
+        }
+
+        // ✅ Top Info Cards
         private void LoadTopInfoCards()
         {
             int pendingLeave = 0;
@@ -50,49 +64,64 @@ namespace VeterinarianEMS.Controls
                 pendingOvertime = (int)overtimeCmd.ExecuteScalar();
             }
 
-            // Update UI with indication
             PendingLeaveTextBlock.Text = $"{pendingLeave} Pending";
             PendingOvertimeTextBlock.Text = $"{pendingOvertime} Pending";
 
-            // Days until next payroll (monthly payroll)
             DateTime today = DateTime.Today;
-            DateTime nextPayroll = new DateTime(today.Year, today.Month, 31); // assuming end of month
+            DateTime nextPayroll = new DateTime(today.Year, today.Month, 31);
             int daysUntilPayroll = (nextPayroll - today).Days;
             DaysUntilPayrollTextBlock.Text = daysUntilPayroll.ToString();
         }
 
+        // ✅ Top Attendance Loader
         private void LoadTopAttendance()
         {
-            var items = new List<string>();
+            var list = new List<TopAttendanceItem>();
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("SELECT EmployeeName, DaysPresent FROM vw_TopAttendance", conn);
                 SqlDataReader reader = cmd.ExecuteReader();
+
                 while (reader.Read())
                 {
-                    items.Add($"{reader["EmployeeName"]} - {reader["DaysPresent"]} Days");
+                    list.Add(new TopAttendanceItem
+                    {
+                        EmployeeName = reader["EmployeeName"].ToString(),
+                        DaysPresent = Convert.ToInt32(reader["DaysPresent"])
+                    });
                 }
             }
-            TopAttendanceList.ItemsSource = items;
+
+            TopAttendanceList.ItemsSource = list;
         }
 
+        // ✅ FIXED - Use correct column name OvertimeHours
         private void LoadTopOvertime()
         {
-            var items = new List<string>();
+            var list = new List<TopOvertimeItem>();
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("SELECT EmployeeName, OvertimeHours FROM vw_TopOvertime", conn);
                 SqlDataReader reader = cmd.ExecuteReader();
+
                 while (reader.Read())
                 {
-                    items.Add($"{reader["EmployeeName"]} - {reader["OvertimeHours"]} Hours");
+                    list.Add(new TopOvertimeItem
+                    {
+                        EmployeeName = reader["EmployeeName"].ToString(),
+                        OvertimeHours = Convert.ToInt32(reader["OvertimeHours"])
+                    });
                 }
             }
-            TopOvertimeList.ItemsSource = items;
+
+            TopOvertimeList.ItemsSource = list;
         }
 
+        // ✅ Keep the rest unchanged
         private void LoadTopRatedEmployees()
         {
             var items = new List<string>();
@@ -108,6 +137,7 @@ namespace VeterinarianEMS.Controls
             }
             TopRatedEmployeesList.ItemsSource = items;
         }
+
         private void LoadPendingAndOnLeave()
         {
             int onTimeCount = 0;
@@ -117,24 +147,21 @@ namespace VeterinarianEMS.Controls
             {
                 conn.Open();
 
-                // Pending Leaves
                 SqlCommand pendingCmd = new SqlCommand("SELECT SUM(PendingLeaveCount) FROM vw_PendingLeaves", conn);
                 var pending = pendingCmd.ExecuteScalar();
                 PendingLeavesText.Text = pending?.ToString() ?? "0";
 
-                // Employees on Leave Today
                 SqlCommand onLeaveCmd = new SqlCommand("SELECT COUNT(*) FROM vw_EmployeesOnLeaveToday", conn);
                 var onLeave = onLeaveCmd.ExecuteScalar();
                 EmployeesOnLeaveText.Text = onLeave?.ToString() ?? "0";
 
-                // ✅ Dynamic On Time / Late
                 string attendanceQuery = @"
-            SELECT a.EmployeeID, a.DateTime AS AttendanceTime, s.StartTime
-            FROM attendance a
-            INNER JOIN shifts s ON a.ShiftID = s.ShiftID
-            WHERE CAST(a.DateTime AS DATE) = CAST(GETDATE() AS DATE)
-              AND a.Type = 'IN'
-        ";
+                    SELECT a.EmployeeID, a.DateTime AS AttendanceTime, s.StartTime
+                    FROM attendance a
+                    INNER JOIN shifts s ON a.ShiftID = s.ShiftID
+                    WHERE CAST(a.DateTime AS DATE) = CAST(GETDATE() AS DATE)
+                      AND a.Type = 'IN'
+                ";
 
                 using (SqlCommand cmd = new SqlCommand(attendanceQuery, conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -152,7 +179,6 @@ namespace VeterinarianEMS.Controls
                 }
             }
 
-            // Update UI dynamically
             OnTimeEmployeesText.Text = onTimeCount.ToString();
             LateEmployeesText.Text = lateCount.ToString();
         }
@@ -213,8 +239,7 @@ namespace VeterinarianEMS.Controls
                     var type = reader["FeedbackType"].ToString();
                     var count = Convert.ToDouble(reader["Count"]);
 
-                    // Assign colors based on feedback type
-                    Brush color = Brushes.Gray; // default
+                    Brush color = Brushes.Gray;
                     if (type.Equals("Positive", StringComparison.OrdinalIgnoreCase))
                         color = Brushes.Green;
                     else if (type.Equals("Neutral", StringComparison.OrdinalIgnoreCase))
@@ -233,6 +258,5 @@ namespace VeterinarianEMS.Controls
 
             EmployeeSatisfactionChart.Series = series;
         }
-
     }
 }
