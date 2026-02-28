@@ -145,11 +145,11 @@
                             ElementStyle="{StaticResource CenterCellStyle}"/>
                         <DataGridTextColumn Header="Department/Position" Binding="{Binding Department}" Width="3*"
                             ElementStyle="{StaticResource CenterCellStyle}"/>
-                        <DataGridTextColumn Header="Shift" Binding="{Binding Shift}" Width="130"
+                        <DataGridTextColumn Header="Shift" Binding="{Binding Shift}" Width="190"
                             ElementStyle="{StaticResource CenterCellStyle}"/>
-                        <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" Width="80"
+                        <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" Width="90"
                             ElementStyle="{StaticResource CenterCellStyle}"/>
-                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="60"
+                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="50"
                             ElementStyle="{StaticResource CenterCellStyle}"/>
 
                         <!-- ACTION BUTTONS COLUMN -->

@@ -54,18 +54,18 @@ namespace VeterinarianEMS
                     conn.Open();
 
                     string query = @"
-                        SELECT 
-                            o.OvertimeID,
-                            e.FirstName,
-                            e.MiddleName,
-                            e.LastName,
-                            o.OvertimeDate,
-                            o.StartTime,
-                            o.EndTime,
-                            o.Status
-                        FROM OvertimeRequests o
-                        INNER JOIN Employees e ON o.EmployeeID = e.EmployeeID
-                        ORDER BY o.OvertimeDate DESC";
+                SELECT 
+                    o.OvertimeID,
+                    e.FirstName,
+                    e.MiddleName,
+                    e.LastName,
+                    o.OvertimeDate,
+                    o.StartTime,
+                    o.EndTime,
+                    o.Status
+                FROM OvertimeRequests o
+                INNER JOIN Employees e ON o.EmployeeID = e.EmployeeID
+                ORDER BY o.OvertimeDate DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -85,9 +85,9 @@ namespace VeterinarianEMS
                             {
                                 OvertimeID = reader.GetInt32(0),
                                 EmployeeName = fullName,
-                                OvertimeDate = reader.GetDateTime(4),
-                                StartTime = reader.GetTimeSpan(5).ToString(@"hh\:mm"),
-                                EndTime = reader.GetTimeSpan(6).ToString(@"hh\:mm"),
+                                OvertimeDate = DateTime.Parse(reader.GetDateTime(4).ToString("MMM/dd/yyyy")), // Aug/01/2025
+                                StartTime = DateTime.Today.Add(reader.GetTimeSpan(5)).ToString("hh:mm tt"), // 12-hour format
+                                EndTime = DateTime.Today.Add(reader.GetTimeSpan(6)).ToString("hh:mm tt"),   // 12-hour format
                                 Status = reader.GetString(7)
                             });
                         }

@@ -53,9 +53,9 @@ namespace VeterinarianEMS
                 {
                     conn.Open();
                     string query = @"
-                        SELECT ShiftID, ShiftName, StartTime, EndTime
-                        FROM shifts
-                        ORDER BY ShiftID ASC";
+                SELECT ShiftID, ShiftName, StartTime, EndTime
+                FROM shifts
+                ORDER BY ShiftID ASC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -68,15 +68,19 @@ namespace VeterinarianEMS
                                 Number = i++,
                                 Id = reader.GetInt32(0),
                                 Name = reader.IsDBNull(1) ? "" : reader.GetString(1),
-                                StartTime = reader.IsDBNull(2) ? "" : reader.GetTimeSpan(2).ToString(@"hh\:mm"), // ✅ fixed
-                                EndTime = reader.IsDBNull(3) ? "" : reader.GetTimeSpan(3).ToString(@"hh\:mm")  // ✅ fixed
+                                StartTime = reader.IsDBNull(2)
+                                    ? ""
+                                    : DateTime.Today.Add(reader.GetTimeSpan(2)).ToString("hh:mm tt"), // 12-hour format
+                                EndTime = reader.IsDBNull(3)
+                                    ? ""
+                                    : DateTime.Today.Add(reader.GetTimeSpan(3)).ToString("hh:mm tt")   // 12-hour format
                             });
                         }
                     }
                 }
 
                 _allShifts = shifts;
-                ApplySearchFilter(); // refresh
+                ApplySearchFilter(); // refresh UI
             }
             catch (Exception ex)
             {

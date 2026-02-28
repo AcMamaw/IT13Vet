@@ -50,17 +50,17 @@ namespace VeterinarianEMS
                     conn.Open();
 
                     string query = @"
-                SELECT e.EmployeeID, e.FirstName, e.MiddleName, e.LastName,
-                       e.Sex, e.Age, e.ContactNumber, e.BaseSalary, e.HireDate,
-                       e.DepartmentID, e.PositionID,
-                       ISNULL(d.DepartmentName, 'No Dept') AS DepartmentName,
-                       ISNULL(p.PositionName, 'No Position') AS PositionName,
-                       s.StartTime, s.EndTime
-                FROM dbo.employees e
-                LEFT JOIN dbo.department d ON e.DepartmentID = d.DepartmentID
-                LEFT JOIN dbo.empositions p ON e.PositionID = p.PositionID
-                LEFT JOIN dbo.employeeshifts es ON e.EmployeeID = es.EmployeeID
-                LEFT JOIN dbo.shifts s ON es.ShiftID = s.ShiftID;";
+            SELECT e.EmployeeID, e.FirstName, e.MiddleName, e.LastName,
+                   e.Sex, e.Age, e.ContactNumber, e.BaseSalary, e.HireDate,
+                   e.DepartmentID, e.PositionID,
+                   ISNULL(d.DepartmentName, 'No Dept') AS DepartmentName,
+                   ISNULL(p.PositionName, 'No Position') AS PositionName,
+                   s.StartTime, s.EndTime
+            FROM dbo.employees e
+            LEFT JOIN dbo.department d ON e.DepartmentID = d.DepartmentID
+            LEFT JOIN dbo.empositions p ON e.PositionID = p.PositionID
+            LEFT JOIN dbo.employeeshifts es ON e.EmployeeID = es.EmployeeID
+            LEFT JOIN dbo.shifts s ON es.ShiftID = s.ShiftID;";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -95,11 +95,16 @@ namespace VeterinarianEMS
                                 };
                             }
 
-                            // Append StartTime - EndTime if exists
+                            // Append StartTime - EndTime in 12-hour format with AM/PM
                             if (reader["StartTime"] != DBNull.Value && reader["EndTime"] != DBNull.Value)
                             {
-                                string startTime = ((TimeSpan)reader["StartTime"]).ToString(@"hh\:mm");
-                                string endTime = ((TimeSpan)reader["EndTime"]).ToString(@"hh\:mm");
+                                TimeSpan startTs = (TimeSpan)reader["StartTime"];
+                                TimeSpan endTs = (TimeSpan)reader["EndTime"];
+
+                                // Convert to DateTime for 12-hour formatting
+                                string startTime = DateTime.Today.Add(startTs).ToString("hh:mm tt");
+                                string endTime = DateTime.Today.Add(endTs).ToString("hh:mm tt");
+
                                 string shiftText = $"{startTime} - {endTime}";
 
                                 if (!string.IsNullOrEmpty(employeeDict[empId].Shift))
@@ -181,26 +186,45 @@ namespace VeterinarianEMS
             ApplySearchFilter();
         }
 
-        // ➕ Add Employee popup
+        // ➕ Add Employee popup with fade-in
         private void AddEmployeeButton_Click(object sender, RoutedEventArgs e)
         {
-            var popupControl = new EmployeePopupControl();
-            popupControl.EmployeeSaved += () => LoadEmployees();
-
-            var popupWindow = new Window
+            try
             {
-                SizeToContent = SizeToContent.WidthAndHeight,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = Window.GetWindow(this),
-                WindowStyle = WindowStyle.None,
-                ResizeMode = ResizeMode.NoResize,
-                Background = System.Windows.Media.Brushes.Transparent,
-                AllowsTransparency = true,
-                ShowInTaskbar = false,
-                Content = popupControl
-            };
+                var popupControl = new EmployeePopupControl();
+                popupControl.EmployeeSaved += () => LoadEmployees(); // refresh employee list
 
-            popupWindow.ShowDialog();
+                // Create hosting window
+                var popupWindow = new Window
+                {
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = Window.GetWindow(this),
+                    WindowStyle = WindowStyle.None,
+                    ResizeMode = ResizeMode.NoResize,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    AllowsTransparency = true,
+                    ShowInTaskbar = false,
+                    Content = popupControl,
+                    Topmost = true,
+                    Opacity = 0 // start transparent for fade-in
+                };
+
+                // Fade-in animation
+                popupWindow.Loaded += (s, e2) =>
+                {
+                    var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                    popupWindow.BeginAnimation(Window.OpacityProperty, fade);
+                };
+
+                // Show modal
+                popupWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while opening the Add Employee window:\n{ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -320,8 +344,16 @@ namespace VeterinarianEMS
                         Content = empShiftControl,
                         SizeToContent = SizeToContent.WidthAndHeight,
                         WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                        ResizeMode = ResizeMode.NoResize
-                        // Do NOT set Owner if it may be the same window
+                        ResizeMode = ResizeMode.NoResize,
+                        Topmost = true
+                    };
+
+                    // Fade-in animation
+                    shiftWindow.Opacity = 0;
+                    shiftWindow.Loaded += (s, e2) =>
+                    {
+                        var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                        shiftWindow.BeginAnimation(Window.OpacityProperty, fade);
                     };
 
                     // Show as modal
@@ -357,7 +389,16 @@ namespace VeterinarianEMS
                     Background = Brushes.Transparent,       // Optional: show rounded border nicely
                     SizeToContent = SizeToContent.WidthAndHeight,
                     ResizeMode = ResizeMode.NoResize,
-                    WindowStartupLocation = WindowStartupLocation.CenterScreen
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                    Topmost = true
+                };
+
+                // Fade-in animation
+                window.Opacity = 0;
+                window.Loaded += (s, e2) =>
+                {
+                    var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                    window.BeginAnimation(Window.OpacityProperty, fade);
                 };
 
                 window.ShowDialog(); // modal popup

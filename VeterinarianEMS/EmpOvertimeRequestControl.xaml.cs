@@ -74,11 +74,11 @@ namespace VeterinarianEMS
 
                     // 🔹 Get that employee’s overtime requests
                     string query = @"
-                SELECT o.OvertimeID, o.EmployeeID,
-                       o.OvertimeDate, o.StartTime, o.EndTime, o.Status
-                FROM overtimerequests o
-                WHERE o.EmployeeID = @EmployeeID
-                ORDER BY o.OvertimeID DESC";
+        SELECT o.OvertimeID, o.EmployeeID,
+               o.OvertimeDate, o.StartTime, o.EndTime, o.Status
+        FROM overtimerequests o
+        WHERE o.EmployeeID = @EmployeeID
+        ORDER BY o.OvertimeID DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -88,19 +88,26 @@ namespace VeterinarianEMS
                         {
                             while (reader.Read())
                             {
-                                string startTime = reader.IsDBNull(3)
-                                    ? ""
-                                    : ((TimeSpan)reader["StartTime"]).ToString(@"hh\:mm");
+                                string startTime = "";
+                                string endTime = "";
 
-                                string endTime = reader.IsDBNull(4)
-                                    ? ""
-                                    : ((TimeSpan)reader["EndTime"]).ToString(@"hh\:mm");
+                                if (!reader.IsDBNull(3))
+                                {
+                                    TimeSpan tsStart = (TimeSpan)reader["StartTime"];
+                                    startTime = DateTime.Today.Add(tsStart).ToString("hh:mm tt"); // 12-hour format
+                                }
+
+                                if (!reader.IsDBNull(4))
+                                {
+                                    TimeSpan tsEnd = (TimeSpan)reader["EndTime"];
+                                    endTime = DateTime.Today.Add(tsEnd).ToString("hh:mm tt"); // 12-hour format
+                                }
 
                                 overtimeList.Add(new OvertimeRequestModel
                                 {
                                     OvertimeID = reader.GetInt32(0),
                                     EmployeeID = reader.GetInt32(1),
-                                    EmployeeName = employeeName, // ✅ show full name instead of ID
+                                    EmployeeName = employeeName,
                                     OvertimeDate = reader.GetDateTime(2),
                                     StartTime = startTime,
                                     EndTime = endTime,
@@ -120,7 +127,6 @@ namespace VeterinarianEMS
                     "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
         // 🔹 SEARCH
         private void ApplySearchFilter()
         {

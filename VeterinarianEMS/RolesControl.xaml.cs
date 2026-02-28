@@ -277,7 +277,30 @@ namespace VeterinarianEMS
                 if (saved) LoadPositions();
             };
 
-            ShowPopup(popup);
+            // Create hosting window with fade-in
+            var popupWindow = new Window
+            {
+                SizeToContent = SizeToContent.WidthAndHeight,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                WindowStyle = WindowStyle.None,
+                ResizeMode = ResizeMode.NoResize,
+                Background = System.Windows.Media.Brushes.Transparent,
+                AllowsTransparency = true,
+                ShowInTaskbar = false,
+                Content = popup,
+                Topmost = true
+            };
+
+            // Fade-in animation
+            popupWindow.Opacity = 0;
+            popupWindow.Loaded += (s, e2) =>
+            {
+                var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                popupWindow.BeginAnimation(Window.OpacityProperty, fade);
+            };
+
+            popupWindow.ShowDialog();
         }
 
         private void EditPosition_Click(object sender, RoutedEventArgs e)
@@ -303,10 +326,32 @@ namespace VeterinarianEMS
                     }
                 };
 
-                ShowPopup(popup);
+                // Create hosting window with fade-in
+                var popupWindow = new Window
+                {
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = Window.GetWindow(this),
+                    WindowStyle = WindowStyle.None,
+                    ResizeMode = ResizeMode.NoResize,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    AllowsTransparency = true,
+                    ShowInTaskbar = false,
+                    Content = popup,
+                    Topmost = true
+                };
+
+                // Fade-in animation
+                popupWindow.Opacity = 0;
+                popupWindow.Loaded += (s, e2) =>
+                {
+                    var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                    popupWindow.BeginAnimation(Window.OpacityProperty, fade);
+                };
+
+                popupWindow.ShowDialog();
             }
         }
-
 
         private void DeletePosition_Click(object sender, RoutedEventArgs e)
         {
@@ -349,7 +394,6 @@ namespace VeterinarianEMS
             }
         }
 
-
         private void AddDepartment_Click(object sender, RoutedEventArgs e)
         {
             PositionPopup popup = new PositionPopup
@@ -364,7 +408,30 @@ namespace VeterinarianEMS
                 if (saved) LoadDepartments();
             };
 
-            ShowPopup(popup);
+            // Create hosting window with fade-in
+            var popupWindow = new Window
+            {
+                SizeToContent = SizeToContent.WidthAndHeight,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                WindowStyle = WindowStyle.None,
+                ResizeMode = ResizeMode.NoResize,
+                Background = System.Windows.Media.Brushes.Transparent,
+                AllowsTransparency = true,
+                ShowInTaskbar = false,
+                Content = popup,
+                Topmost = true
+            };
+
+            // Fade-in animation
+            popupWindow.Opacity = 0;
+            popupWindow.Loaded += (s, e2) =>
+            {
+                var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                popupWindow.BeginAnimation(Window.OpacityProperty, fade);
+            };
+
+            popupWindow.ShowDialog();
         }
 
         private void EditDepartment_Click(object sender, RoutedEventArgs e)
@@ -373,11 +440,13 @@ namespace VeterinarianEMS
             {
                 PositionPopup popup = new PositionPopup
                 {
-                    TableName = "department",
-                    FieldName = "DepartmentName",
+                    TableName = "department",         // the table to edit
+                    FieldName = "DepartmentName",     // the column to update
+                    IdColumn = "DepartmentID",        // ✅ set the correct primary key column
                     TitleLabel = "Department Name:",
                     EditingId = dep.Id
                 };
+
                 popup.PositionNameTextBox.Text = dep.Name;
 
                 popup.OnClose += (saved) =>
@@ -385,7 +454,30 @@ namespace VeterinarianEMS
                     if (saved) LoadDepartments();
                 };
 
-                ShowPopup(popup);
+                // Create hosting window with fade-in
+                var popupWindow = new Window
+                {
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = Window.GetWindow(this),
+                    WindowStyle = WindowStyle.None,
+                    ResizeMode = ResizeMode.NoResize,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    AllowsTransparency = true,
+                    ShowInTaskbar = false,
+                    Content = popup,
+                    Topmost = true
+                };
+
+                // Fade-in animation
+                popupWindow.Opacity = 0;
+                popupWindow.Loaded += (s, e2) =>
+                {
+                    var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(250));
+                    popupWindow.BeginAnimation(Window.OpacityProperty, fade);
+                };
+
+                popupWindow.ShowDialog();
             }
         }
 

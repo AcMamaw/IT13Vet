@@ -6,6 +6,7 @@
         public int AttendanceId { get; set; }
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }
+        public string DateTimeString { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }   // computed: e.g., "Present", "Absent"
         public DateTime DateTime { get; set; }

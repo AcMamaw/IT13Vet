@@ -47,79 +47,81 @@ namespace VeterinarianEMS
             };
             _clockTimer.Start();
         }
-
-            private void LoadAttendance()
+        // 🔄 Load attendance for logged-in employee
+        private void LoadAttendance()
+        {
+            if (_employeeId == null)
             {
-                if (_employeeId == null)
-                {
-                    MessageBox.Show("Employee ID not found for logged-in user.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                MessageBox.Show("Employee ID not found for logged-in user.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
-                try
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionString))
                 {
-                    using (SqlConnection conn = new SqlConnection(_connectionString))
+                    conn.Open();
+
+                    string query = @"
+WITH AttendanceStatus AS (
+    SELECT 
+        e.EmployeeID,
+        (e.FirstName + ' ' + e.LastName) AS EmployeeName,
+        a.Type,
+        a.Status,
+        a.DateTime
+    FROM attendance a
+    INNER JOIN employees e ON a.EmployeeID = e.EmployeeID
+    WHERE e.EmployeeID = @empId
+),
+LeaveCheck AS (
+    SELECT 
+        l.EmployeeID,
+        lb.LeaveType,
+        lb.RemainingLeaves
+    FROM leaverequests l
+    INNER JOIN leavebalance lb ON l.EmployeeID = lb.EmployeeID
+    WHERE l.Status = 'Approved'
+      AND CAST(GETDATE() AS DATE) BETWEEN l.StartDate AND l.EndDate
+),
+ShiftCheck AS (
+    SELECT 
+        es.EmployeeID,
+        es.ShiftDays
+    FROM employeeshifts es
+    WHERE es.EmployeeID = @empId
+)
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY COALESCE(a.DateTime, GETDATE()) DESC) AS Number,
+    e.EmployeeID,
+    e.FirstName + ' ' + e.LastName AS EmployeeName,
+    CASE 
+        WHEN a.Status = 'Absent' THEN '--'
+        WHEN a.Type IN ('IN', 'OUT', 'Late') THEN a.Type
+        WHEN l.EmployeeID IS NOT NULL THEN 'Leave (' + l.LeaveType + ' - ' + CAST(l.RemainingLeaves AS VARCHAR) + ')'
+        ELSE '--'
+    END AS Type,
+    CASE 
+        WHEN a.Status = 'Present' THEN 'Present'
+        WHEN l.EmployeeID IS NOT NULL THEN 'On Leave'
+        ELSE 'Absent'
+    END AS Status,
+    -- ✅ Show date in MM/dd/yyyy format + 12-hour time
+    CASE 
+        WHEN a.DateTime IS NOT NULL THEN FORMAT(a.DateTime, 'MM/dd/yyyy hh:mm tt')
+        ELSE '--'
+    END AS DateTime,
+    s.ShiftDays
+FROM employees e
+LEFT JOIN AttendanceStatus a ON e.EmployeeID = a.EmployeeID
+LEFT JOIN LeaveCheck l ON e.EmployeeID = l.EmployeeID
+LEFT JOIN ShiftCheck s ON e.EmployeeID = s.EmployeeID
+WHERE e.EmployeeID = @empId
+ORDER BY COALESCE(a.DateTime, GETDATE()) DESC;
+";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        conn.Open();
-
-                        string query = @"
-                    WITH AttendanceStatus AS (
-                        SELECT 
-                            e.EmployeeID,
-                            (e.FirstName + ' ' + e.LastName) AS EmployeeName,
-                            CAST(a.DateTime AS DATE) AS AttendanceDate,
-                            a.Type,
-                            a.Status,
-                            a.DateTime
-                        FROM attendance a
-                        INNER JOIN employees e ON a.EmployeeID = e.EmployeeID
-                        WHERE e.EmployeeID = @empId
-                    ),
-                    LeaveCheck AS (
-                        SELECT 
-                            l.EmployeeID,
-                            CAST(GETDATE() AS DATE) AS Today,
-                            lb.LeaveType,
-                            lb.RemainingLeaves
-                        FROM leaverequests l
-                        INNER JOIN leavebalance lb ON l.EmployeeID = lb.EmployeeID
-                        WHERE l.Status = 'Approved'
-                            AND CAST(GETDATE() AS DATE) BETWEEN l.StartDate AND l.EndDate
-                    ),
-                    ShiftCheck AS (
-                        SELECT 
-                            es.EmployeeID,
-                            es.ShiftDays
-                        FROM employeeshifts es
-                        WHERE es.EmployeeID = @empId
-                    )
-
-                    SELECT 
-                        ROW_NUMBER() OVER (ORDER BY COALESCE(a.DateTime, GETDATE()) DESC) AS Number,
-                        e.EmployeeID,
-                        e.FirstName + ' ' + e.LastName AS EmployeeName,
-                        CASE 
-                            WHEN a.Type = 'IN' THEN 'IN'
-                            WHEN a.Type = 'OUT' THEN 'OUT'
-                            WHEN a.Type = 'Late' THEN 'Late'
-                            WHEN l.EmployeeID IS NOT NULL THEN 'Leave (' + l.LeaveType + ' - ' + CAST(l.RemainingLeaves AS VARCHAR) + ')'
-                            ELSE '--'
-                        END AS Type,
-                        CASE 
-                            WHEN a.Status = 'Present' THEN 'Present'
-                            WHEN l.EmployeeID IS NOT NULL THEN 'On Leave'
-                            ELSE 'Absent'
-                        END AS Status,
-                        COALESCE(a.DateTime, GETDATE()) AS DateTime,
-                        s.ShiftDays
-                    FROM employees e
-                    LEFT JOIN AttendanceStatus a ON e.EmployeeID = a.EmployeeID
-                    LEFT JOIN LeaveCheck l ON e.EmployeeID = l.EmployeeID
-                    LEFT JOIN ShiftCheck s ON e.EmployeeID = s.EmployeeID
-                    WHERE e.EmployeeID = @empId
-                    ORDER BY COALESCE(a.DateTime, GETDATE()) DESC;";
-
-                        SqlCommand cmd = new SqlCommand(query, conn);
                         cmd.Parameters.AddWithValue("@empId", _employeeId);
 
                         SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -132,11 +134,13 @@ namespace VeterinarianEMS
                         ApplySearchFilter(); // apply pagination + search
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error loading attendance: " + ex.Message);
-                }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading attendance: " + ex.Message);
+            }
+        }
+
 
         // 🔍 APPLY SEARCH FILTER
         private void ApplySearchFilter()
@@ -207,6 +211,8 @@ namespace VeterinarianEMS
                 int start = total == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
                 int end = Math.Min(start + pageSize - 1, total);
                 PaginationStatus.Text = $"Showing {currentPage} to {totalPages} of {total} entries";
+                PageNumberButton.Content = currentPage.ToString(); 
+
             }
         }
 

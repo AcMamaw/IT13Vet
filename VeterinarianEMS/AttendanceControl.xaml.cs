@@ -54,116 +54,134 @@ namespace VeterinarianEMS
             _clockTimer.Start();
         }
 
-     // 🔄 Load all attendance (for all employees, with normalized Type + leave/absent logic)
-private void LoadAttendance()
-{
-    try
-    {
-        var tempList = new List<AttendanceModel>();
-
-        using (SqlConnection conn = new SqlConnection(connectionString))
+        // 🔄 Load all attendance for a specific date (excluding EmployeeID 1008 & 2006)
+        private void LoadAttendance(DateTime attendanceDate)
         {
-            conn.Open();
-
-            string query = @"
-                WITH AttendanceStatus AS (
-                    SELECT 
-                        e.EmployeeID,
-                        (e.FirstName + ' ' + e.LastName) AS EmployeeName,
-                        a.Type AS RawType,
-                        a.DateTime,
-                        CAST(a.DateTime AS DATE) AS AttendanceDate,
-                        s.StartTime
-                    FROM attendance a
-                    INNER JOIN employees e ON a.EmployeeID = e.EmployeeID
-                    LEFT JOIN employeeshifts es ON e.EmployeeID = es.EmployeeID
-                    LEFT JOIN shifts s ON es.ShiftID = s.ShiftID
-                ),
-                LeaveCheck AS (
-                    SELECT 
-                        l.EmployeeID,
-                        lb.LeaveType,
-                        lb.RemainingLeaves,
-                        l.StartDate,
-                        l.EndDate
-                    FROM leaverequests l
-                    INNER JOIN leavebalance lb ON l.EmployeeID = lb.EmployeeID
-                    WHERE l.Status = 'Approved'
-                ),
-                -- normalize sign/type and evaluate Late vs IN using StartTime
-                Normalized AS (
-                    SELECT
-                        a.EmployeeID,
-                        a.EmployeeName,
-                        a.RawType,
-                        a.DateTime,
-                        a.AttendanceDate,
-                        a.StartTime,
-                        CASE
-                            -- Sign In (DB may store 'Sign In' or 'IN') -> determine IN vs Late by comparing to shift start
-                            WHEN a.RawType IN ('Sign In', 'IN') AND a.StartTime IS NOT NULL THEN
-                                CASE
-                                    WHEN a.DateTime <= DATEADD(MINUTE, 10, DATEADD(SECOND, DATEDIFF(SECOND, 0, a.StartTime), CAST(a.AttendanceDate AS DATETIME))) THEN 'IN'
-                                    ELSE 'Late'
-                                END
-                            WHEN a.RawType IN ('Sign Out', 'OUT') THEN 'OUT'
-                            ELSE NULL
-                        END AS CalcType
-                    FROM AttendanceStatus a
-                )
-
-                SELECT 
-                    ROW_NUMBER() OVER (ORDER BY COALESCE(n.DateTime, GETDATE()) DESC) AS Number,
-                    e.EmployeeID,
-                    (e.FirstName + ' ' + e.LastName) AS EmployeeName,
-                    -- final Type: normalized if attendance exists, otherwise leave info or --
-                    CASE
-                        WHEN n.CalcType IS NOT NULL THEN n.CalcType
-                    WHEN l.EmployeeID IS NOT NULL THEN 
-                        '' + CAST(l.RemainingLeaves AS VARCHAR(10)) + ' Remain Days'
-                    ELSE '--'
-                    END AS Type,
-                    -- Status: Present if normalized type exists (IN/Late/OUT), On Leave if leave exists, otherwise Absent
-                    CASE
-                        WHEN n.CalcType IN ('IN', 'Late', 'OUT') THEN 'Present'
-                        WHEN l.EmployeeID IS NOT NULL THEN 'On Leave'
-                        ELSE 'Absent'
-                    END AS Status,
-                    COALESCE(n.DateTime, GETDATE()) AS DateTime
-                FROM employees e
-                LEFT JOIN Normalized n ON e.EmployeeID = n.EmployeeID
-                LEFT JOIN LeaveCheck l 
-                    ON e.EmployeeID = l.EmployeeID
-                    AND CAST(GETDATE() AS DATE) BETWEEN l.StartDate AND l.EndDate
-                ORDER BY COALESCE(n.DateTime, GETDATE()) DESC;";
-
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            using (SqlDataReader reader = cmd.ExecuteReader())
+            try
             {
-                int i = 1;
-                while (reader.Read())
+                var tempList = new List<AttendanceModel>();
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    tempList.Add(new AttendanceModel
+                    conn.Open();
+
+                    string query = @"
+WITH AttendanceStatus AS (
+    SELECT 
+        e.EmployeeID,
+        (e.FirstName + ' ' + e.LastName) AS EmployeeName,
+        a.Type AS RawType,
+        a.Status AS RawStatus,  -- ✅ Include Status from DB (Late, Present, etc.)
+        a.DateTime,
+        CAST(a.DateTime AS DATE) AS AttendanceDate,
+        s.StartTime
+    FROM attendance a
+    INNER JOIN employees e ON a.EmployeeID = e.EmployeeID
+    LEFT JOIN employeeshifts es ON e.EmployeeID = es.EmployeeID
+    LEFT JOIN shifts s ON es.ShiftID = s.ShiftID
+    WHERE e.PositionID != 2005  -- Exclude HR
+),
+LeaveCheck AS (
+    SELECT 
+        l.EmployeeID,
+        lb.LeaveType,
+        lb.RemainingLeaves,
+        l.StartDate,
+        l.EndDate
+    FROM leaverequests l
+    INNER JOIN leavebalance lb ON l.EmployeeID = lb.EmployeeID
+    WHERE l.Status = 'Approved'
+),
+Normalized AS (
+    SELECT
+        a.EmployeeID,
+        a.EmployeeName,
+        a.RawType,
+        a.RawStatus,
+        a.DateTime,
+        a.AttendanceDate,
+        a.StartTime,
+        CASE
+            WHEN a.RawStatus = 'Late' THEN 'Late'  -- ✅ Already marked Late in DB
+            WHEN a.RawType IN ('Sign In', 'IN') AND a.StartTime IS NOT NULL THEN
+                CASE
+                    WHEN a.DateTime <= DATEADD(MINUTE, 10, DATEADD(SECOND, DATEDIFF(SECOND, 0, a.StartTime), CAST(a.AttendanceDate AS DATETIME))) THEN 'IN'
+                    ELSE 'Late'
+                END
+            WHEN a.RawType IN ('Sign Out', 'OUT') THEN 'OUT'
+            ELSE NULL
+        END AS CalcType
+    FROM AttendanceStatus a
+)
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY COALESCE(n.DateTime, @AttendanceDate) DESC) AS Number,
+    e.EmployeeID,
+    (e.FirstName + ' ' + e.LastName) AS EmployeeName,
+
+    -- ✅ TYPE: Show IN, OUT, or Leave days (Late is treated as IN)
+    CASE
+        WHEN n.CalcType IN ('IN', 'Late') THEN 'IN'
+        WHEN n.CalcType = 'OUT' THEN 'OUT'
+        WHEN l.EmployeeID IS NOT NULL THEN CAST(l.RemainingLeaves AS VARCHAR(10)) + ' Remain Days'
+        ELSE '--'
+    END AS Type,
+
+    -- ✅ STATUS: Show actual Late, Present, On Leave, or Absent
+    CASE
+        WHEN n.CalcType = 'Late' THEN 'Late'
+        WHEN n.CalcType IN ('IN', 'OUT') THEN 'Present'
+        WHEN l.EmployeeID IS NOT NULL THEN 'On Leave'
+        ELSE 'Absent'
+    END AS Status,
+
+    COALESCE(n.DateTime, @AttendanceDate) AS DateTime
+FROM employees e
+LEFT JOIN Normalized n ON e.EmployeeID = n.EmployeeID
+LEFT JOIN LeaveCheck l 
+    ON e.EmployeeID = l.EmployeeID
+    AND @AttendanceDate BETWEEN l.StartDate AND l.EndDate
+WHERE e.EmployeeID NOT IN (1008, 2006)  -- ✅ Exclude specific employees
+ORDER BY COALESCE(n.DateTime, @AttendanceDate) DESC;
+";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        Number = i++,
-                        EmployeeId = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
-                        EmployeeName = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                        Type = reader.IsDBNull(3) ? "--" : reader.GetString(3),
-                        Status = reader.IsDBNull(4) ? "Absent" : reader.GetString(4),
-                        DateTime = reader.IsDBNull(5) ? DateTime.MinValue : reader.GetDateTime(5)
-                    });
+                        cmd.Parameters.AddWithValue("@AttendanceDate", attendanceDate);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            int i = 1;
+                            while (reader.Read())
+                            {
+                                tempList.Add(new AttendanceModel
+                                {
+                                    Number = i++,
+                                    EmployeeId = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                                    EmployeeName = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                                    Type = reader.IsDBNull(3) ? "--" : reader.GetString(3),
+                                    Status = reader.IsDBNull(4) ? "Absent" : reader.GetString(4),
+                                    DateTime = reader.IsDBNull(5) ? DateTime.MinValue : reader.GetDateTime(5)
+                                });
+                            }
+                        }
+                    }
                 }
+
+                // ✅ Apply filtered result to the display
+                _allAttendance = tempList;
+                ApplySearchFilter();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading attendance: " + ex.Message);
             }
         }
 
-        _allAttendance = tempList;
-        ApplySearchFilter();
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show("Error loading attendance: " + ex.Message);
-    }
-}
+        // 🔄 Overload: Load attendance for today
+        private void LoadAttendance()
+        {
+            LoadAttendance(DateTime.Today);
+        }
 
         // 🔍 Apply search filter
         private void ApplySearchFilter()

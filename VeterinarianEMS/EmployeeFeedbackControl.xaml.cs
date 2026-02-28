@@ -159,7 +159,7 @@ namespace VeterinarianEMS
             int total = _filteredFeedbacks.Count;
             int start = total == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
             int end = Math.Min(start + pageSize - 1, total);
-            ShowingText.Text = $"Showing {start} to {end} of {total} entries";
+            ShowingText.Text = $"Showing {currentPage} to {totalPages} of {total} entries";
         }
 
         // 🔍 Search changed

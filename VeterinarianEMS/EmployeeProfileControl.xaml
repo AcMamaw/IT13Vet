@@ -35,30 +35,29 @@
                             <!-- Employee Info + Buttons -->
                         </Grid.ColumnDefinitions>
 
-                        <!-- PROFILE IMAGE -->
                         <Button Width="130" Height="130"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Click="ProfileImage_Click">
-                            <Grid>
-                                <!-- Background Circle -->
-                                <Ellipse Fill="#DDD"
-                                         Width="130"
-                                         Height="130"
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"/>
-
-                                <!-- Profile Image -->
-                                <Image x:Name="ProfileImage"
-                                       Width="130"
-                                       Height="130"
-                                       Stretch="UniformToFill"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center">
-                                    <Image.Clip>
-                                        <EllipseGeometry Center="65,65" RadiusX="65" RadiusY="65"/>
-                                    </Image.Clip>
-                                </Image>
+        Background="Transparent"
+        BorderThickness="0"
+        Click="ProfileImage_Click">
+                            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Width="128" Height="128"
+                            CornerRadius="60"
+                            BorderBrush="Gray"
+                            BorderThickness="0"
+                            Margin="0,0,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                                    <Image x:Name="ProfileImage"
+                   Width="130"
+                   Height="120"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center">
+                                        <Image.Clip>
+                                            <EllipseGeometry Center="65,65" RadiusX="65" RadiusY="65"/>
+                                        </Image.Clip>
+                                    </Image>
+                                </Border>
                             </Grid>
                         </Button>
 

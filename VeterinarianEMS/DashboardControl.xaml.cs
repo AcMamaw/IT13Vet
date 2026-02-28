@@ -3,6 +3,7 @@ using LiveCharts.Wpf;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -30,7 +31,8 @@ namespace VeterinarianEMS.Controls
             LoadEmployeeSatisfaction();
         }
 
-        // ✅ Models for binding to ListBoxes
+        #region Models
+
         public class TopAttendanceItem
         {
             public string EmployeeName { get; set; }
@@ -43,220 +45,333 @@ namespace VeterinarianEMS.Controls
             public int OvertimeHours { get; set; }
         }
 
-        // ✅ Top Info Cards
-        private void LoadTopInfoCards()
+        public class TopRatedEmployeeItem
         {
-            int pendingLeave = 0;
-            int pendingOvertime = 0;
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-
-                // Pending Leaves
-                SqlCommand leaveCmd = new SqlCommand(
-                    "SELECT COUNT(*) FROM leaverequests WHERE Status = 'Pending'", conn);
-                pendingLeave = (int)leaveCmd.ExecuteScalar();
-
-                // Pending Overtime
-                SqlCommand overtimeCmd = new SqlCommand(
-                    "SELECT COUNT(*) FROM overtimerequests WHERE Status = 'Pending'", conn);
-                pendingOvertime = (int)overtimeCmd.ExecuteScalar();
-            }
-
-            PendingLeaveTextBlock.Text = $"{pendingLeave} Pending";
-            PendingOvertimeTextBlock.Text = $"{pendingOvertime} Pending";
-
-            DateTime today = DateTime.Today;
-            DateTime nextPayroll = new DateTime(today.Year, today.Month, 31);
-            int daysUntilPayroll = (nextPayroll - today).Days;
-            DaysUntilPayrollTextBlock.Text = daysUntilPayroll.ToString();
+            public string EmployeeName { get; set; }
+            public double Rating { get; set; }
         }
 
-        // ✅ Top Attendance Loader
+        #endregion
+
+        #region Top Info Cards
+
+        private void LoadTopInfoCards()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    int pendingLeave = Convert.ToInt32(
+                        new SqlCommand("SELECT COUNT(*) FROM leaverequests WHERE Status = 'Pending'", conn)
+                        .ExecuteScalar());
+
+                    int pendingOvertime = Convert.ToInt32(
+                        new SqlCommand("SELECT COUNT(*) FROM overtimerequests WHERE Status = 'Pending'", conn)
+                        .ExecuteScalar());
+
+                    PendingLeaveTextBlock.Text = $"{pendingLeave} Pending";
+                    PendingOvertimeTextBlock.Text = $"{pendingOvertime} Pending";
+
+                    // FIXED Payroll Date (no crash on Feb, Apr, etc.)
+                    DateTime today = DateTime.Today;
+                    DateTime nextPayroll = new DateTime(today.Year, today.Month,
+                        DateTime.DaysInMonth(today.Year, today.Month));
+
+                    if (today > nextPayroll)
+                        nextPayroll = nextPayroll.AddMonths(1);
+
+                    DaysUntilPayrollTextBlock.Text =
+                        (nextPayroll - today).Days.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading dashboard cards:\n{ex.Message}");
+            }
+        }
+
+        #endregion
+
+        #region Top Attendance
+
         private void LoadTopAttendance()
         {
             var list = new List<TopAttendanceItem>();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT EmployeeName, DaysPresent FROM vw_TopAttendance", conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    list.Add(new TopAttendanceItem
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SELECT EmployeeName, DaysPresent FROM vw_TopAttendance", conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        EmployeeName = reader["EmployeeName"].ToString(),
-                        DaysPresent = Convert.ToInt32(reader["DaysPresent"])
-                    });
+                        while (reader.Read())
+                        {
+                            list.Add(new TopAttendanceItem
+                            {
+                                EmployeeName = reader["EmployeeName"]?.ToString(),
+                                DaysPresent = Convert.ToInt32(reader["DaysPresent"])
+                            });
+                        }
+                    }
                 }
-            }
 
-            TopAttendanceList.ItemsSource = list;
+                TopAttendanceList.ItemsSource = list;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading top attendance:\n{ex.Message}");
+            }
         }
 
-        // ✅ FIXED - Use correct column name OvertimeHours
+        #endregion
+
+        #region Top Overtime
+
         private void LoadTopOvertime()
         {
             var list = new List<TopOvertimeItem>();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT EmployeeName, OvertimeHours FROM vw_TopOvertime", conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    list.Add(new TopOvertimeItem
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SELECT EmployeeName, OvertimeHours FROM vw_TopOvertime", conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        EmployeeName = reader["EmployeeName"].ToString(),
-                        OvertimeHours = Convert.ToInt32(reader["OvertimeHours"])
-                    });
+                        while (reader.Read())
+                        {
+                            list.Add(new TopOvertimeItem
+                            {
+                                EmployeeName = reader["EmployeeName"]?.ToString(),
+                                OvertimeHours = Convert.ToInt32(reader["OvertimeHours"])
+                            });
+                        }
+                    }
                 }
-            }
 
-            TopOvertimeList.ItemsSource = list;
+                TopOvertimeList.ItemsSource = list;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading overtime:\n{ex.Message}");
+            }
         }
 
-        // ✅ Keep the rest unchanged
+        #endregion
+
+        #region Top Rated Employees
+
         private void LoadTopRatedEmployees()
         {
-            var items = new List<string>();
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            var items = new List<TopRatedEmployeeItem>();
+
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT EmployeeName, AvgRating FROM vw_TopRatedEmployees", conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    items.Add($"{reader["EmployeeName"]} - {Convert.ToDouble(reader["AvgRating"]):0.0}");
+                    conn.Open();
+
+                    string query = @"
+                        SELECT TOP 3 FirstName, MiddleName, LastName, EmployeeRating
+                        FROM TopRatedEmployees
+                        WHERE EmployeeRating IS NOT NULL
+                        ORDER BY EmployeeRating DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string fullName =
+                                $"{reader["FirstName"]} {reader["MiddleName"]} {reader["LastName"]}"
+                                .Replace("  ", " ")
+                                .Trim();
+
+                            items.Add(new TopRatedEmployeeItem
+                            {
+                                EmployeeName = fullName,
+                                Rating = Convert.ToDouble(reader["EmployeeRating"])
+                            });
+                        }
+                    }
                 }
+
+                TopRatedEmployeesList.ItemsSource = items;
             }
-            TopRatedEmployeesList.ItemsSource = items;
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading top rated employees:\n{ex.Message}");
+            }
         }
+
+        #endregion
+
+        #region Pending & On Leave
 
         private void LoadPendingAndOnLeave()
         {
             int onTimeCount = 0;
             int lateCount = 0;
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-
-                SqlCommand pendingCmd = new SqlCommand("SELECT SUM(PendingLeaveCount) FROM vw_PendingLeaves", conn);
-                var pending = pendingCmd.ExecuteScalar();
-                PendingLeavesText.Text = pending?.ToString() ?? "0";
-
-                SqlCommand onLeaveCmd = new SqlCommand("SELECT COUNT(*) FROM vw_EmployeesOnLeaveToday", conn);
-                var onLeave = onLeaveCmd.ExecuteScalar();
-                EmployeesOnLeaveText.Text = onLeave?.ToString() ?? "0";
-
-                string attendanceQuery = @"
-                    SELECT a.EmployeeID, a.DateTime AS AttendanceTime, s.StartTime
-                    FROM attendance a
-                    INNER JOIN shifts s ON a.ShiftID = s.ShiftID
-                    WHERE CAST(a.DateTime AS DATE) = CAST(GETDATE() AS DATE)
-                      AND a.Type = 'IN'
-                ";
-
-                using (SqlCommand cmd = new SqlCommand(attendanceQuery, conn))
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    while (reader.Read())
-                    {
-                        DateTime attendanceTime = Convert.ToDateTime(reader["AttendanceTime"]);
-                        TimeSpan shiftStart = TimeSpan.Parse(reader["StartTime"].ToString());
+                    conn.Open();
 
-                        if (attendanceTime.TimeOfDay <= shiftStart)
-                            onTimeCount++;
-                        else
-                            lateCount++;
+                    PendingLeavesText.Text = Convert.ToString(
+                        new SqlCommand("SELECT SUM(PendingLeaveCount) FROM vw_PendingLeaves", conn)
+                        .ExecuteScalar()) ?? "0";
+
+                    EmployeesOnLeaveText.Text = Convert.ToString(
+                        new SqlCommand("SELECT COUNT(*) FROM vw_EmployeesOnLeaveToday", conn)
+                        .ExecuteScalar()) ?? "0";
+
+                    string query = @"
+                        SELECT a.DateTime, s.StartTime
+                        FROM attendance a
+                        INNER JOIN shifts s ON a.ShiftID = s.ShiftID
+                        WHERE CAST(a.DateTime AS DATE) = CAST(GETDATE() AS DATE)
+                        AND a.Type = 'IN'";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            DateTime attendanceTime =
+                                Convert.ToDateTime(reader["DateTime"]);
+
+                            TimeSpan shiftStart =
+                                TimeSpan.Parse(reader["StartTime"].ToString());
+
+                            if (attendanceTime.TimeOfDay <= shiftStart)
+                                onTimeCount++;
+                            else
+                                lateCount++;
+                        }
                     }
                 }
-            }
 
-            OnTimeEmployeesText.Text = onTimeCount.ToString();
-            LateEmployeesText.Text = lateCount.ToString();
+                OnTimeEmployeesText.Text = onTimeCount.ToString();
+                LateEmployeesText.Text = lateCount.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading attendance summary:\n{ex.Message}");
+            }
         }
+
+        #endregion
+
+        #region Attendance Trend Chart
 
         private void LoadAttendanceTrend()
         {
             var months = new List<string>();
             var values = new ChartValues<int>();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT MonthName, DaysPresent FROM vw_AttendanceTrend ORDER BY Year, MonthNumber", conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    months.Add(reader["MonthName"].ToString());
-                    values.Add(Convert.ToInt32(reader["DaysPresent"]));
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SELECT MonthName, DaysPresent FROM vw_AttendanceTrend ORDER BY Year, MonthNumber", conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            months.Add(reader["MonthName"].ToString());
+                            values.Add(Convert.ToInt32(reader["DaysPresent"]));
+                        }
+                    }
                 }
+
+                AttendanceTrendChart.Series = new SeriesCollection
+                {
+                    new ColumnSeries
+                    {
+                        Title = "Attendance",
+                        Values = values,
+                        Fill = new SolidColorBrush(Color.FromRgb(155, 89, 182))
+                    }
+                };
+
+                AttendanceTrendChart.AxisX.Clear();
+                AttendanceTrendChart.AxisX.Add(new Axis
+                {
+                    Title = "Month",
+                    Labels = months
+                });
+
+                AttendanceTrendChart.AxisY.Clear();
+                AttendanceTrendChart.AxisY.Add(new Axis
+                {
+                    Title = "Days Present"
+                });
             }
-
-            AttendanceTrendChart.Series = new SeriesCollection
+            catch (Exception ex)
             {
-                new ColumnSeries
-                {
-                    Title = "Attendance",
-                    Values = values,
-                    Fill = new SolidColorBrush(Color.FromRgb(155, 89, 182))
-                }
-            };
-
-            AttendanceTrendChart.AxisX.Clear();
-            AttendanceTrendChart.AxisX.Add(new LiveCharts.Wpf.Axis
-            {
-                Title = "Month",
-                Labels = months
-            });
-
-            AttendanceTrendChart.AxisY.Clear();
-            AttendanceTrendChart.AxisY.Add(new LiveCharts.Wpf.Axis
-            {
-                Title = "Days Present",
-                LabelFormatter = value => value.ToString()
-            });
+                MessageBox.Show($"Error loading attendance chart:\n{ex.Message}");
+            }
         }
+
+        #endregion
+
+        #region Employee Satisfaction Chart
 
         private void LoadEmployeeSatisfaction()
         {
             var series = new SeriesCollection();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT FeedbackType, Count FROM vw_EmployeeSatisfaction", conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    var type = reader["FeedbackType"].ToString();
-                    var count = Convert.ToDouble(reader["Count"]);
-
-                    Brush color = Brushes.Gray;
-                    if (type.Equals("Positive", StringComparison.OrdinalIgnoreCase))
-                        color = Brushes.Green;
-                    else if (type.Equals("Neutral", StringComparison.OrdinalIgnoreCase))
-                        color = Brushes.Yellow;
-                    else if (type.Equals("Negative", StringComparison.OrdinalIgnoreCase))
-                        color = Brushes.Red;
-
-                    series.Add(new PieSeries
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(
+                        "SELECT FeedbackType, Count FROM vw_EmployeeSatisfaction", conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        Title = type,
-                        Values = new ChartValues<double> { count },
-                        Fill = color
-                    });
-                }
-            }
+                        while (reader.Read())
+                        {
+                            string type = reader["FeedbackType"].ToString();
+                            double count = Convert.ToDouble(reader["Count"]);
 
-            EmployeeSatisfactionChart.Series = series;
+                            Brush color = Brushes.Gray;
+                            if (type.Equals("Positive", StringComparison.OrdinalIgnoreCase))
+                                color = Brushes.Green;
+                            else if (type.Equals("Neutral", StringComparison.OrdinalIgnoreCase))
+                                color = Brushes.Gold;
+                            else if (type.Equals("Negative", StringComparison.OrdinalIgnoreCase))
+                                color = Brushes.Red;
+
+                            series.Add(new PieSeries
+                            {
+                                Title = type,
+                                Values = new ChartValues<double> { count },
+                                Fill = color
+                            });
+                        }
+                    }
+                }
+
+                EmployeeSatisfactionChart.Series = series;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading satisfaction chart:\n{ex.Message}");
+            }
         }
+
+        #endregion
     }
 }

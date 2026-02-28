@@ -247,7 +247,6 @@ namespace VeterinarianEMS
 
             window.ShowDialog();
         }
-
         private void ShiftButton_Click(object sender, RoutedEventArgs e)
         {
             int employeeId = UserSession.EmployeeID ?? 0;
@@ -257,10 +256,11 @@ namespace VeterinarianEMS
                 return;
             }
 
-            // Create the EmpScheduleControl instead of EmpView
+            // Create the EmpScheduleControl to show the employee's schedule
             var shiftControl = new EmpScheduleControl();
-            shiftControl.LoadEmployeeShift(employeeId); // Load the employee's schedule
+            shiftControl.LoadEmployeeShift(employeeId);
 
+            // Create hosting window
             var window = new Window
             {
                 Content = shiftControl,

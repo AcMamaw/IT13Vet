@@ -201,7 +201,7 @@ namespace VeterinarianEMS.Views
                              SET FirstName=@FirstName, MiddleName=@MiddleName, LastName=@LastName,
                                  Sex=@Sex, DOB=@DOB, ContactNumber=@ContactNumber, HireDate=@HireDate,
                                  Address=@Address, DepartmentID=@DepartmentID, PositionID=@PositionID,
-                                 BaseSalary=@BaseSalary
+                                 BaseSalary=@BaseSalary, Email=@Email
                              WHERE EmployeeID=@EmployeeID";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -223,6 +223,9 @@ namespace VeterinarianEMS.Views
 
                         decimal salary = decimal.TryParse(BaseSalaryTextBox.Text, out var s) ? s : 0;
                         cmd.Parameters.AddWithValue("@BaseSalary", salary);
+
+                        // ✅ Add Email parameter
+                        cmd.Parameters.AddWithValue("@Email", string.IsNullOrEmpty(EmailTextBox.Text) ? (object)DBNull.Value : EmailTextBox.Text);
 
                         cmd.Parameters.AddWithValue("@EmployeeID", _employeeId);
 

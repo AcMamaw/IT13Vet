@@ -11,7 +11,7 @@ namespace VeterinarianEMS
         public static class UserSession
         {
             public static int? UserId { get; set; }
-            public static int? EmployeeID { get; set; }  // ✅ Add this
+            public static int? EmployeeID { get; set; } 
             public static string Username { get; set; }
             public static string FullName { get; set; }
             public static string Role { get; set; }
